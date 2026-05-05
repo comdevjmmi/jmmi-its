@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { GetServerSidePropsContext } from 'next/types';
 import Cookies from 'universal-cookie';
 
-import { getToken } from '@/lib/cookies';
+import { getToken, removeToken, removeRefreshToken } from '@/lib/cookies';
 
 import { UninterceptedApiError } from '@/types/api';
 const context = <GetServerSidePropsContext>{};
@@ -54,6 +54,23 @@ api.interceptors.response.use(
     return config;
   },
   (error: AxiosError<UninterceptedApiError>) => {
+    // If token is invalid/expired, clear stored tokens and redirect to login
+    const status = error.response?.status;
+    const serverMessage = error.response?.data?.message;
+    const messageStr = typeof serverMessage === 'string' ? serverMessage : '';
+    if (
+      typeof window !== 'undefined' &&
+      (status === 401 || /expired|invalid/i.test(messageStr))
+    ) {
+      try {
+        removeToken();
+        removeRefreshToken();
+      } catch (e) {
+        // ignore
+      }
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
     // parse error
     if (error.response?.data.message) {
       return Promise.reject({
