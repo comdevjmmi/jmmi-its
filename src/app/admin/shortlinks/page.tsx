@@ -1,13 +1,12 @@
 'use client';
 
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Edit, Plus, Trash2, X } from 'lucide-react';
 import * as React from 'react';
 
 import { buildShortUrl } from '@/lib/link-url';
 
 import Button from '@/components/buttons/Button';
 import Loading from '@/components/Loading';
-import Modal from '@/components/Modal';
 import Typography from '@/components/Typography';
 
 import {
@@ -151,52 +150,69 @@ export default function ShortLinksAdminPage() {
         </table>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingId ? 'Edit Short Link' : 'Buat Short Link Baru'}
-      >
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='space-y-2'>
-            <label className='text-xs font-semibold uppercase tracking-wider text-slate-500'>
-              Short Code
-            </label>
-            <input
-              type='text'
-              value={formState.short_code}
-              onChange={(e) => setFormState({ ...formState, short_code: e.target.value })}
-              className='w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
-              placeholder='e.g. daftar-lomba'
-            />
-            <Typography variant='c-s' className='text-slate-400'>
-              Kosongkan untuk generate otomatis
-            </Typography>
-          </div>
+      {isModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 px-4 backdrop-blur-sm'>
+          <div className='w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl'>
+            <div className='mb-6 flex items-start justify-between'>
+              <div>
+                <Typography as='h3' variant='h6' weight='bold' className='text-slate-900'>
+                  {editingId ? 'Edit Short Link' : 'Buat Short Link Baru'}
+                </Typography>
+                <Typography variant='c-s' className='text-slate-500'>
+                  {editingId ? 'Sesuaikan pengaturan tautan pendek Anda.' : 'Buat tautan baru yang lebih ringkas dan mudah dibagikan.'}
+                </Typography>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className='p-1 text-slate-400 hover:text-slate-600 transition-colors'
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-          <div className='space-y-2'>
-            <label className='text-xs font-semibold uppercase tracking-wider text-slate-500'>
-              Target URL
-            </label>
-            <input
-              required
-              type='url'
-              value={formState.url}
-              onChange={(e) => setFormState({ ...formState, url: e.target.value })}
-              className='w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
-              placeholder='https://example.com'
-            />
-          </div>
+            <form onSubmit={handleSubmit} className='space-y-6'>
+              <div className='space-y-2'>
+                <label className='text-xs font-semibold uppercase tracking-wider text-slate-500'>
+                  Short Code
+                </label>
+                <input
+                  type='text'
+                  value={formState.short_code}
+                  onChange={(e) => setFormState({ ...formState, short_code: e.target.value })}
+                  className='w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
+                  placeholder='e.g. daftar-lomba'
+                />
+                <Typography variant='c-s' className='text-slate-400'>
+                  Kosongkan untuk generate otomatis
+                </Typography>
+              </div>
 
-          <div className='flex justify-end space-x-3 pt-4 border-t border-slate-100'>
-            <Button variant='outline' onClick={() => setIsModalOpen(false)}>
-              Batal
-            </Button>
-            <Button type='submit' variant='primary'>
-              {editingId ? 'Simpan Perubahan' : 'Buat Short Link'}
-            </Button>
+              <div className='space-y-2'>
+                <label className='text-xs font-semibold uppercase tracking-wider text-slate-500'>
+                  Target URL
+                </label>
+                <input
+                  required
+                  type='url'
+                  value={formState.url}
+                  onChange={(e) => setFormState({ ...formState, url: e.target.value })}
+                  className='w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
+                  placeholder='https://example.com'
+                />
+              </div>
+
+              <div className='flex justify-end space-x-3 pt-6 border-t border-slate-100'>
+                <Button variant='outline' onClick={() => setIsModalOpen(false)}>
+                  Batal
+                </Button>
+                <Button type='submit' variant='primary'>
+                  {editingId ? 'Simpan Perubahan' : 'Buat Short Link'}
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
-      </Modal>
+        </div>
+      )}
     </div>
   );
 }
