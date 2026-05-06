@@ -77,7 +77,7 @@ export default function ShortLinksAdminPage() {
           <Typography as='h1' variant='h4' weight='bold' className='text-slate-800'>
             Short Links
           </Typography>
-          <Typography variant='body-s' className='text-slate-500'>
+          <Typography variant='body' className='text-slate-500'>
             Kelola URL shortener mandiri
           </Typography>
         </div>
@@ -112,10 +112,10 @@ export default function ShortLinksAdminPage() {
               shortLinks.map((link) => (
                 <tr key={link.short_link_id} className='hover:bg-slate-50 transition-colors'>
                   <td className='px-6 py-4'>
-                    <Typography variant='body-s' weight='bold' className='text-blue-600'>
+                    <Typography variant='body' weight='bold' className='text-blue-600'>
                       /{link.short_code}
                     </Typography>
-                    <Typography variant='c-s' className='text-slate-400'>
+                    <Typography variant='label' className='text-slate-400'>
                       {buildShortUrl(link.short_path)}
                     </Typography>
                   </td>
@@ -158,7 +158,7 @@ export default function ShortLinksAdminPage() {
                 <Typography as='h3' variant='h6' weight='bold' className='text-slate-900'>
                   {editingId ? 'Edit Short Link' : 'Buat Short Link Baru'}
                 </Typography>
-                <Typography variant='c-s' className='text-slate-500'>
+                <Typography variant='label' className='text-slate-500'>
                   {editingId ? 'Sesuaikan pengaturan tautan pendek Anda.' : 'Buat tautan baru yang lebih ringkas dan mudah dibagikan.'}
                 </Typography>
               </div>
@@ -182,7 +182,7 @@ export default function ShortLinksAdminPage() {
                   className='w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
                   placeholder='e.g. daftar-lomba'
                 />
-                <Typography variant='c-s' className='text-slate-400'>
+                <Typography variant='label' className='text-slate-400'>
                   Kosongkan untuk generate otomatis
                 </Typography>
               </div>
