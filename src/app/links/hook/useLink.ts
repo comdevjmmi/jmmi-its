@@ -109,7 +109,7 @@ export const useCreateLink = () => {
     onSuccess: () => {
       showToast('Link berhasil dibuat', SUCCESS_TOAST);
       queryClient.invalidateQueries({ queryKey: ['links'] });
-      router.push('/links/admin/links');
+      router.push('/admin/links');
     },
     onError: (error) => {
       const message =
@@ -149,7 +149,7 @@ export const useUpdateLink = () => {
     onSuccess: () => {
       showToast('Link berhasil diupdate', SUCCESS_TOAST);
       queryClient.invalidateQueries({ queryKey: ['links'] });
-      router.push('/links/admin/links');
+      router.push('/admin/links');
     },
     onError: (error) => {
       const message =
@@ -190,7 +190,7 @@ export const useDeleteLink = () => {
     onSuccess: () => {
       showToast('Link berhasil dihapus', SUCCESS_TOAST);
       queryClient.invalidateQueries({ queryKey: ['links'] });
-      router.push('/links/admin/links');
+      router.push('/admin/links');
     },
     onError: (error) => {
       const message =

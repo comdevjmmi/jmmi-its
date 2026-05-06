@@ -32,7 +32,6 @@ export default function AddLinkPage() {
     React.useState<string>('');
   const [linkTitle, setLinkTitle] = React.useState<string>('');
   const [linkUrl, setLinkUrl] = React.useState<string>('');
-  const [shortCode, setShortCode] = React.useState<string>('');
 
   // Filtered subheadings based on selected folder
   const filteredSubheadings = React.useMemo(() => {
@@ -95,7 +94,6 @@ export default function AddLinkPage() {
           : selectedSubheading,
       title: linkTitle,
       link: linkUrl,
-      short_code: shortCode || undefined,
       weight: 0, // Default weight
     };
 
@@ -342,23 +340,6 @@ export default function AddLinkPage() {
                 placeholder='Tambahkan link URL'
                 className='w-full px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/30 border border-white/10 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors outline-none'
               />
-            </div>
-
-            {/* 7. Short Code */}
-            <div className='space-y-2'>
-              <label className='block text-gray-200 text-sm font-medium ml-1'>
-                Short code (opsional)
-              </label>
-              <input
-                type='text'
-                value={shortCode}
-                onChange={(e) => setShortCode(e.target.value)}
-                placeholder='contoh: kepanitiaan-2026'
-                className='w-full px-4 py-3 rounded-xl bg-white/5 text-white placeholder-white/30 border border-white/10 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors outline-none'
-              />
-              <p className='text-xs text-white/55 ml-1'>
-                Kosongkan untuk membuat kode pendek otomatis dari judul link.
-              </p>
             </div>
 
             {/* Actions */}

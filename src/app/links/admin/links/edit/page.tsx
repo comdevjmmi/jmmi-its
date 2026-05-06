@@ -45,7 +45,6 @@ function EditLinkContent() {
     React.useState<string>('');
   const [linkTitle, setLinkTitle] = React.useState<string>('');
   const [linkUrl, setLinkUrl] = React.useState<string>('');
-  const [shortCode, setShortCode] = React.useState<string>('');
 
   // Filtered subheadings
   const filteredSubheadings = React.useMemo(() => {
@@ -79,7 +78,6 @@ function EditLinkContent() {
     if (link) {
       setLinkTitle(link.title);
       setLinkUrl(link.link);
-      setShortCode(link.short_code);
       setSelectedCategory(
         link.category_id
           ? link.category_id
@@ -130,7 +128,6 @@ function EditLinkContent() {
           : selectedSubheading,
       title: linkTitle,
       link: linkUrl,
-      short_code: shortCode || undefined,
     };
 
     try {
@@ -318,23 +315,6 @@ function EditLinkContent() {
                 placeholder='Tambahkan link URL'
                 className='w-full px-4 py-3 rounded-lg bg-blue-700 text-white placeholder-blue-300 border-none focus:ring-2 focus:ring-blue-500'
               />
-            </div>
-
-            {/* 7. Short Code */}
-            <div className='space-y-2'>
-              <label className='block text-gray-100 text-sm font-medium'>
-                Short code (opsional)
-              </label>
-              <input
-                type='text'
-                value={shortCode}
-                onChange={(e) => setShortCode(e.target.value)}
-                placeholder='contoh: kepanitiaan-2026'
-                className='w-full px-4 py-3 rounded-lg bg-blue-700 text-white placeholder-blue-300 border-none focus:ring-2 focus:ring-blue-500'
-              />
-              <p className='text-xs text-blue-100/70'>
-                Kosongkan untuk mempertahankan kode yang sudah ada.
-              </p>
             </div>
 
             {/* Actions */}

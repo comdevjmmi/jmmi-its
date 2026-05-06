@@ -23,9 +23,5 @@ export const buildShortUrl = (path: string): string => {
 };
 
 export const getLinkTargetUrl = (link: TrackableLink): string => {
-  if (link.short_path) {
-    return buildShortUrl(link.short_path);
-  }
-
   return link.link;
 };

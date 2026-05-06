@@ -47,6 +47,12 @@ const menuItems: AdminMenuItem[] = [
     description: 'Kategori, folder, dan sumber daya',
     icon: Link2,
   },
+  {
+    label: 'Shorten Link',
+    href: '/admin/shortlinks',
+    description: 'URL shortener mandiri',
+    icon: Link2,
+  },
 
   {
     label: 'Kalender',

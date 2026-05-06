@@ -23,7 +23,6 @@ const UNCATEGORIZED_CATEGORY_OPTION = '__uncategorized_category__';
 type LinkFormState = {
   title: string;
   link: string;
-  short_code: string;
   folder_id: string;
   subheading_id: string;
 };
@@ -31,7 +30,6 @@ type LinkFormState = {
 const EMPTY_FORM: LinkFormState = {
   title: '',
   link: '',
-  short_code: '',
   folder_id: GENERAL_FOLDER_OPTION,
   subheading_id: NO_SUBHEADING_OPTION,
 };
@@ -319,7 +317,6 @@ export default function AdminLinksDashboardPage() {
     setFormState({
       title: item.title,
       link: item.link,
-      short_code: item.short_code,
       folder_id: item.folder_id ?? GENERAL_FOLDER_OPTION,
       subheading_id: item.subheading_id ?? NO_SUBHEADING_OPTION,
     });
@@ -368,7 +365,6 @@ export default function AdminLinksDashboardPage() {
     const payload = {
       title: formState.title.trim(),
       link: formState.link.trim(),
-      short_code: formState.short_code.trim() || undefined,
       category_id:
         formCategoryId !== GENERAL_CATEGORY_OPTION &&
         formCategoryId !== UNCATEGORIZED_CATEGORY_OPTION &&
@@ -822,16 +818,10 @@ export default function AdminLinksDashboardPage() {
                             <div className='min-w-0'>
                               <p className='truncate text-xs font-semibold text-slate-900'>{link.title}</p>
                               <p className='truncate text-[11px] text-slate-500'>{link.link}</p>
-                              <p className='truncate text-[11px] text-emerald-700'>
-                                Short: {buildShortUrl(link.short_path)}
-                              </p>
                             </div>
                             <div className='flex items-center gap-2'>
                               <span className='rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700'>
                                 {getLinkPlacementLabel(link)}
-                              </span>
-                              <span className='rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700'>
-                                Klik {link.click_count}
                               </span>
                               <DashboardActionButton
                                 onClick={() => handleOpenEdit(link)}
@@ -956,10 +946,6 @@ export default function AdminLinksDashboardPage() {
                             <div key={link.link_id} className='rounded-lg border border-slate-200 bg-slate-50 p-3'>
                               <p className='text-sm font-medium text-slate-900'>{link.title}</p>
                               <p className='truncate text-xs text-slate-500'>{link.link}</p>
-                              <p className='truncate text-[11px] text-emerald-700'>
-                                Short: {buildShortUrl(link.short_path)}
-                              </p>
-                              <p className='text-[11px] font-medium text-emerald-700'>Klik {link.click_count}</p>
                             </div>
                           ))}
                         </div>
@@ -1226,14 +1212,8 @@ export default function AdminLinksDashboardPage() {
                                                 <div className='min-w-0'>
                                                   <p className='truncate text-xs font-semibold text-slate-900'>{link.title}</p>
                                                   <p className='truncate text-[11px] text-slate-500'>{link.link}</p>
-                                                  <p className='truncate text-[11px] text-emerald-700'>
-                                                    Short: {buildShortUrl(link.short_path)}
-                                                  </p>
                                                 </div>
                                                 <div className='flex gap-2'>
-                                                  <span className='rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 self-center'>
-                                                    Klik {link.click_count}
-                                                  </span>
                                                   <DashboardActionButton
                                                     onClick={() => handleOpenEdit(link)}
                                                     variant='outline'
@@ -1270,14 +1250,8 @@ export default function AdminLinksDashboardPage() {
                                             <div className='min-w-0'>
                                               <p className='truncate text-xs font-semibold text-slate-900'>{link.title}</p>
                                               <p className='truncate text-[11px] text-slate-500'>{link.link}</p>
-                                              <p className='truncate text-[11px] text-emerald-700'>
-                                                Short: {buildShortUrl(link.short_path)}
-                                              </p>
                                             </div>
                                             <div className='flex gap-2'>
-                                              <span className='rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 self-center'>
-                                                Klik {link.click_count}
-                                              </span>
                                               <DashboardActionButton
                                                 onClick={() => handleOpenEdit(link)}
                                                 variant='outline'
@@ -1636,20 +1610,6 @@ export default function AdminLinksDashboardPage() {
                     placeholder='https://...'
                     className='w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-brand-green-500'
                   />
-                </div>
-
-                <div className='space-y-1.5'>
-                  <label className='text-xs font-semibold uppercase tracking-wider text-slate-500'>Short code</label>
-                  <input
-                    type='text'
-                    value={formState.short_code}
-                    onChange={(event) =>
-                      setFormState((previous) => ({ ...previous, short_code: event.target.value }))
-                    }
-                    placeholder='contoh: kabinet-2026'
-                    className='w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-brand-green-500'
-                  />
-                  <p className='text-[11px] text-slate-500'>Kosongkan untuk membuat kode otomatis dari judul link.</p>
                 </div>
 
                 <div className='space-y-1.5'>

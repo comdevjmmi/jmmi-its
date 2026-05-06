@@ -119,15 +119,7 @@ export default function LinksListPage() {
                     <Typography className='text-gray-400 text-sm mt-0.5 truncate group-hover:text-gray-300'>
                       {item.link}
                     </Typography>
-                    <Typography className='mt-1 text-xs text-emerald-300/90 truncate'>
-                      Short: {buildShortUrl(item.short_path)}
-                    </Typography>
                   </div>
-                  <span
-                    className='text-xs px-3 py-1 rounded-full font-medium shrink-0 border bg-white/10 text-white border-white/15'
-                  >
-                    Klik {item.click_count}
-                  </span>
                 </button>
               ))
             )}
