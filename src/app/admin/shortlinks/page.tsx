@@ -20,12 +20,22 @@ import {
 import { ShortLink } from '@/types/entities/links';
 
 // ─── QR Download Helper ───────────────────────────────────────────────────────
-const downloadQRCode = (shortCode: string, shortUrl: string) => {
+const downloadQRCode = (shortCode: string, qrSize: number) => {
   const canvas = document.getElementById(`qr-canvas-${shortCode}`) as HTMLCanvasElement | null;
   if (!canvas) return;
+
+  // Keep exported dimensions equal to displayed QR size so logo scale stays consistent.
+  const outputCanvas = document.createElement('canvas');
+  outputCanvas.width = qrSize;
+  outputCanvas.height = qrSize;
+
+  const ctx = outputCanvas.getContext('2d');
+  if (!ctx) return;
+  ctx.drawImage(canvas, 0, 0, qrSize, qrSize);
+
   const link = document.createElement('a');
   link.download = `qrcode-${shortCode}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.href = outputCanvas.toDataURL('image/png');
   link.click();
 };
 
@@ -98,7 +108,7 @@ function QRModal({ link, shortUrl, onClose }: QRModalProps) {
           <Button
             variant='primary'
             leftIcon={Download}
-            onClick={() => downloadQRCode(link.short_code, shortUrl)}
+            onClick={() => downloadQRCode(link.short_code, 200)}
             className='w-full justify-center rounded-xl'
           >
             Download QR Code
@@ -367,7 +377,7 @@ export default function ShortLinksAdminPage() {
                     <Button
                       variant='primary'
                       leftIcon={Download}
-                      onClick={() => downloadQRCode(successLink.short_code, buildShortUrl(successLink.short_path))}
+                      onClick={() => downloadQRCode(successLink.short_code, 220)}
                       className='flex-1 justify-center'
                     >
                       Download QR
