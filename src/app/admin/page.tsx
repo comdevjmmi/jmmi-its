@@ -10,7 +10,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 
-import { useGetAllFinanceTransactions } from './hook/useFinance';
+import { useGetFinanceReport } from './hook/useFinance';
 import { useGetAllCalendarEvents } from './hook/useCalendar';
 import useAuthStore from '@/stores/useAuthStore';
 
@@ -334,16 +334,15 @@ function UpcomingEventCard({ events }: { events: ReminderEvent[] }) {
 
 export default function AdminDashboard() {
   const user = useAuthStore.useUser();
-  const { data: transactions = [] } = useGetAllFinanceTransactions();
-  const { data: calendarEvents = [] } = useGetAllCalendarEvents();
+  const { data: reportData } = useGetFinanceReport();
+  const { data: calendarPagination } = useGetAllCalendarEvents(1, 50);
 
-  const totalIncome = transactions
-    .filter((transaction) => transaction.type === 'income')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const totalExpense = transactions
-    .filter((transaction) => transaction.type === 'expenses')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const balance = totalIncome - totalExpense;
+  const transactions = reportData?.transactions || [];
+  const calendarEvents = calendarPagination?.data || [];
+
+  const totalIncome = reportData?.total_income || 0;
+  const totalExpense = reportData?.total_expense || 0;
+  const balance = reportData?.current_balance || 0;
 
   const weeklySeries = useMemo(() => buildWeeklySeries(transactions), [transactions]);
 
