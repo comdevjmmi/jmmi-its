@@ -9,7 +9,7 @@ import Typography from '@/components/Typography';
 
 import { IoChevronBack } from 'react-icons/io5';
 
-import { useGetFinanceReport } from '@/app/finance/hook/useFinance';
+import { useGetFinanceReport, useGetFinanceTransactions } from '@/app/finance/hook/useFinance';
 
 import { FinanceTransaction } from '@/types/entities/finance';
 
@@ -262,27 +262,22 @@ function TransactionRow({ transaction }: { transaction: FinanceTransaction }) {
 }
 
 export default function FinancePage() {
-  const { data, isLoading, fetchFinanceReport } = useGetFinanceReport();
+  const { data, isLoading: reportLoading, refetch: refetchReport } = useGetFinanceReport();
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
+  const { transactions, total, isLoading: transactionsLoading, refetch: refetchTransactions } = useGetFinanceTransactions(currentPage, itemsPerPage);
 
   React.useEffect(() => {
-    fetchFinanceReport();
-  }, [fetchFinanceReport]);
+    refetchReport();
+  }, [refetchReport]);
 
   const weeklySeries = React.useMemo(() => {
     return buildWeeklySeries(data?.transactions ?? []);
   }, [data?.transactions]);
 
-  const transactions = data?.transactions ?? [];
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
-  const paginatedTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(total / itemsPerPage);
 
-  React.useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
+  const isLoading = reportLoading || transactionsLoading;
 
   if (isLoading) {
     return <Loading fullScreen />;
@@ -332,7 +327,7 @@ export default function FinancePage() {
 
             {transactions.length ? (
               <div className='space-y-3'>
-                {paginatedTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <TransactionRow
                     key={transaction.transaction_id}
                     transaction={transaction}

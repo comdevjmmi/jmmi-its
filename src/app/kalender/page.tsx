@@ -115,7 +115,7 @@ function getEventDateTime(eventDate: string, eventTime: string) {
 }
 
 export default function CalendarPage() {
-  const { data, isLoading, fetchCalendarEvents } = useGetCalendarEvents();
+  const { events, isLoading, refetch } = useGetCalendarEvents(1, 1000);
   const [activeFilter, setActiveFilter] = React.useState<'all' | 'upcoming' | 'past'>('upcoming');
   const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
   const [selectedDateKey, setSelectedDateKey] = React.useState<string | null>(null);
@@ -125,13 +125,13 @@ export default function CalendarPage() {
   });
 
   React.useEffect(() => {
-    fetchCalendarEvents();
-  }, [fetchCalendarEvents]);
+    refetch();
+  }, [refetch]);
 
   const filteredEvents = React.useMemo(() => {
     const now = new Date();
 
-    return [...data]
+    return [...events]
       .filter((event) => {
         if (activeFilter === 'all') return true;
 
@@ -147,7 +147,7 @@ export default function CalendarPage() {
         const rightTime = getEventDateTime(right.event_date, right.event_time).getTime();
         return leftTime - rightTime;
       });
-  }, [activeFilter, data]);
+  }, [activeFilter, events]);
 
   const filterOptions = [
     { key: 'all' as const, label: 'Semua' },

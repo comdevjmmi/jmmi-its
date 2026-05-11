@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, Edit, Plus, QrCode, Trash2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Edit, Plus, QrCode, Trash2, X } from 'lucide-react';
 import * as React from 'react';
 import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
 
@@ -297,7 +297,9 @@ function QRModal({ link, shortUrl, logoAspectRatio, onRequestDownload, onClose }
 }
 
 export default function ShortLinksAdminPage() {
-  const { data: shortLinks, isLoading, fetchShortLinks } = useGetShortLinks();
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 10;
+  const { shortLinks, total, isLoading, refetch } = useGetShortLinks(currentPage, itemsPerPage);
   const { mutateAsync: createShortLink } = useCreateShortLink();
   const { mutateAsync: updateShortLink } = useUpdateShortLink();
   const { mutateAsync: deleteShortLink } = useDeleteShortLink();
@@ -346,7 +348,7 @@ export default function ShortLinksAdminPage() {
         const res = await createShortLink(formState);
         result = res?.data ?? undefined;
       }
-      await fetchShortLinks();
+      await refetch();
       if (result) {
         setSuccessLink(result);
       } else {
@@ -365,13 +367,15 @@ export default function ShortLinksAdminPage() {
   const handleDelete = async (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus short link ini?')) {
       await deleteShortLink(id);
-      fetchShortLinks();
+      refetch();
     }
   };
 
   const handleOpenDownloadModal = (shortCode: string, shortUrl: string, defaultSize: number) => {
     setDownloadConfig({ shortCode, shortUrl, defaultSize });
   };
+
+  const totalPages = Math.ceil(total / itemsPerPage);
 
   if (isLoading) return <Loading fullScreen />;
 
@@ -479,6 +483,33 @@ export default function ShortLinksAdminPage() {
             )}
           </tbody>
         </table>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className='flex items-center justify-between border-t border-slate-100 bg-slate-50 px-6 py-4'>
+            <Typography variant='label' className='text-slate-600'>
+              Halaman {currentPage} dari {totalPages}
+            </Typography>
+            <div className='flex gap-2'>
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className='inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:border-blue-400 hover:enabled:bg-blue-50'
+              >
+                <ChevronLeft size={16} />
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className='inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:border-blue-400 hover:enabled:bg-blue-50'
+              >
+                Berikutnya
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

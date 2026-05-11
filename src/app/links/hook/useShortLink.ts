@@ -7,6 +7,13 @@ import {
   ShortLink,
 } from '@/types/entities/links';
 
+export interface PaginatedShortLinks {
+  data: ShortLink[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface CreateShortLinkRequest {
   short_code?: string;
   url: string;
@@ -17,25 +24,32 @@ export interface UpdateShortLinkRequest {
   url?: string;
 }
 
-export const useGetShortLinks = () => {
+export const useGetShortLinks = (page = 1, limit = 10) => {
   const {
     data: shortLinksData,
     isLoading,
     isError,
     refetch,
-  } = useQuery<ApiResponse<ShortLink[]>, AxiosError<ApiError>>({
-    queryKey: ['shortlinks'],
+  } = useQuery<ApiResponse<PaginatedShortLinks>, AxiosError<ApiError>>({
+    queryKey: ['shortlinks', page, limit],
     queryFn: async () => {
-      const res = await api.get<ApiResponse<ShortLink[]>>('/shortlinks');
+      const res = await api.get<ApiResponse<PaginatedShortLinks>>('/shortlinks', {
+        params: { page, limit },
+      });
       return res.data;
     },
   });
 
+  const paginationData = shortLinksData?.data || { data: [], total: 0, page, limit };
+
   return {
-    data: shortLinksData?.data || [],
+    shortLinks: paginationData.data,
+    total: paginationData.total,
+    currentPage: paginationData.page,
+    itemsPerPage: paginationData.limit,
     isLoading,
     error: isError ? 'Failed to fetch short links' : null,
-    fetchShortLinks: refetch,
+    refetch,
   };
 };
 
