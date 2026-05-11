@@ -19,34 +19,211 @@ import {
 
 import { ShortLink } from '@/types/entities/links';
 
+const QR_LOGO_SRC = '/images/jmmi-logo.png';
+const QR_SIZE_MIN = 160;
+const QR_SIZE_MAX = 800;
+const QR_SIZE_STEP = 20;
+
 // ─── QR Download Helper ───────────────────────────────────────────────────────
-const downloadQRCode = (shortCode: string, qrSize: number) => {
-  const canvas = document.getElementById(`qr-canvas-${shortCode}`) as HTMLCanvasElement | null;
+const downloadQRCodeFromCanvas = (canvasId: string, shortCode: string) => {
+  const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
   if (!canvas) return;
-
-  // Keep exported dimensions equal to displayed QR size so logo scale stays consistent.
-  const outputCanvas = document.createElement('canvas');
-  outputCanvas.width = qrSize;
-  outputCanvas.height = qrSize;
-
-  const ctx = outputCanvas.getContext('2d');
-  if (!ctx) return;
-  ctx.drawImage(canvas, 0, 0, qrSize, qrSize);
 
   const link = document.createElement('a');
   link.download = `qrcode-${shortCode}.png`;
-  link.href = outputCanvas.toDataURL('image/png');
+  link.href = canvas.toDataURL('image/png');
   link.click();
 };
+
+const getQrLogoSize = (qrSize: number, logoAspectRatio: number) => {
+  const maxLogoSize = Math.round(qrSize * 0.2);
+
+  if (logoAspectRatio >= 1) {
+    return {
+      width: maxLogoSize,
+      height: Math.max(1, Math.round(maxLogoSize / logoAspectRatio)),
+    };
+  }
+
+  return {
+    width: Math.max(1, Math.round(maxLogoSize * logoAspectRatio)),
+    height: maxLogoSize,
+  };
+};
+
+const useLogoAspectRatio = (src: string) => {
+  const [logoAspectRatio, setLogoAspectRatio] = React.useState(1);
+
+  React.useEffect(() => {
+    const logo = new Image();
+    logo.onload = () => {
+      if (logo.naturalWidth > 0 && logo.naturalHeight > 0) {
+        setLogoAspectRatio(logo.naturalWidth / logo.naturalHeight);
+      }
+    };
+    logo.src = src;
+  }, [src]);
+
+  return logoAspectRatio;
+};
+
+type QRDownloadModalProps = {
+  shortCode: string;
+  shortUrl: string;
+  defaultSize: number;
+  logoAspectRatio: number;
+  onClose: () => void;
+};
+
+function QRDownloadModal({
+  shortCode,
+  shortUrl,
+  defaultSize,
+  logoAspectRatio,
+  onClose,
+}: QRDownloadModalProps) {
+  const [selectedSize, setSelectedSize] = React.useState<number>(defaultSize);
+  const downloadCanvasId = `qr-download-canvas-${shortCode}`;
+
+  const logoSize = React.useMemo(
+    () => getQrLogoSize(selectedSize, logoAspectRatio),
+    [selectedSize, logoAspectRatio],
+  );
+
+  const previewScale = Math.min(1, 260 / selectedSize);
+
+  const handleDownload = () => {
+    downloadQRCodeFromCanvas(downloadCanvasId, shortCode);
+  };
+
+  return (
+    <div className='fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/55 px-4 backdrop-blur-sm'>
+      <div className='w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl'>
+        <div className='mb-4 flex items-start justify-between'>
+          <div>
+            <Typography as='h3' variant='h6' weight='bold' className='text-slate-900'>
+              Download QR
+            </Typography>
+            <Typography variant='label' className='text-slate-500'>
+              Pilih ukuran hasil unduhan
+            </Typography>
+          </div>
+          <button
+            onClick={onClose}
+            className='p-1 text-slate-400 transition-colors hover:text-slate-600'
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className='space-y-4'>
+          <div>
+            <Typography variant='label' className='mb-2 block text-slate-600'>
+              Ukuran PNG
+            </Typography>
+            <div className='rounded-lg border border-slate-200 bg-slate-50 px-4 py-3'>
+              <input
+                type='range'
+                min={QR_SIZE_MIN}
+                max={QR_SIZE_MAX}
+                step={QR_SIZE_STEP}
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(Number(e.target.value))}
+                className='h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-blue-600'
+                aria-label='Pilih ukuran QR PNG'
+              />
+              <div className='mt-2 flex items-center justify-between text-xs text-slate-500'>
+                <span>{QR_SIZE_MIN}px</span>
+                <span className='rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700'>
+                  {selectedSize} x {selectedSize}px
+                </span>
+                <span>{QR_SIZE_MAX}px</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Typography variant='label' className='mb-2 block text-slate-600'>
+              Preview hasil download
+            </Typography>
+            <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
+              <div className='mx-auto flex h-[280px] items-center justify-center overflow-auto'>
+                <div
+                  style={{
+                    width: selectedSize,
+                    height: selectedSize,
+                    transform: `scale(${previewScale})`,
+                    transformOrigin: 'center center',
+                  }}
+                >
+                  <QRCodeSVG
+                    value={shortUrl}
+                    size={selectedSize}
+                    level='H'
+                    includeMargin
+                    imageSettings={{
+                      src: QR_LOGO_SRC,
+                      height: logoSize.height,
+                      width: logoSize.width,
+                      excavate: true,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='w-full rounded-lg bg-slate-50 px-3 py-2 text-center'>
+            <Typography variant='label' className='break-all font-mono text-blue-600'>
+              {shortUrl}
+            </Typography>
+          </div>
+
+          <div className='flex gap-3 pt-1'>
+            <Button variant='outline' onClick={onClose} className='flex-1 justify-center'>
+              Batal
+            </Button>
+            <Button variant='primary' leftIcon={Download} onClick={handleDownload} className='flex-1 justify-center'>
+              Download
+            </Button>
+          </div>
+        </div>
+
+        {/* Hidden canvas used as source for PNG export with selected size */}
+        <QRCodeCanvas
+          id={downloadCanvasId}
+          value={shortUrl}
+          size={selectedSize}
+          className='hidden'
+          includeMargin
+          level='H'
+          imageSettings={{
+            src: QR_LOGO_SRC,
+            height: logoSize.height,
+            width: logoSize.width,
+            excavate: true,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 // ─── QR Modal ────────────────────────────────────────────────────────────────
 type QRModalProps = {
   link: ShortLink;
   shortUrl: string;
+  logoAspectRatio: number;
+  onRequestDownload: (shortCode: string, shortUrl: string, defaultSize: number) => void;
   onClose: () => void;
 };
 
-function QRModal({ link, shortUrl, onClose }: QRModalProps) {
+function QRModal({ link, shortUrl, logoAspectRatio, onRequestDownload, onClose }: QRModalProps) {
+  const logoSize = React.useMemo(
+    () => getQrLogoSize(200, logoAspectRatio),
+    [logoAspectRatio],
+  );
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm'>
       <div className='w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl'>
@@ -78,9 +255,9 @@ function QRModal({ link, shortUrl, onClose }: QRModalProps) {
               includeMargin
               level='H'
               imageSettings={{
-                src: '/images/jmmi-logo.png',
-                height: 40,
-                width: 40,
+                src: QR_LOGO_SRC,
+                height: logoSize.height,
+                width: logoSize.width,
                 excavate: true,
               }}
             />
@@ -91,9 +268,9 @@ function QRModal({ link, shortUrl, onClose }: QRModalProps) {
               level='H'
               includeMargin
               imageSettings={{
-                src: '/images/jmmi-logo.png',
-                height: 40,
-                width: 40,
+                src: QR_LOGO_SRC,
+                height: logoSize.height,
+                width: logoSize.width,
                 excavate: true,
               }}
             />
@@ -108,7 +285,7 @@ function QRModal({ link, shortUrl, onClose }: QRModalProps) {
           <Button
             variant='primary'
             leftIcon={Download}
-            onClick={() => downloadQRCode(link.short_code, 200)}
+            onClick={() => onRequestDownload(link.short_code, shortUrl, 200)}
             className='w-full justify-center rounded-xl'
           >
             Download QR Code
@@ -135,6 +312,13 @@ export default function ShortLinksAdminPage() {
   const [successLink, setSuccessLink] = React.useState<ShortLink | null>(null);
   // QR viewer dari tabel
   const [viewingQRLink, setViewingQRLink] = React.useState<ShortLink | null>(null);
+  const [downloadConfig, setDownloadConfig] = React.useState<{
+    shortCode: string;
+    shortUrl: string;
+    defaultSize: number;
+  } | null>(null);
+
+  const logoAspectRatio = useLogoAspectRatio(QR_LOGO_SRC);
 
   const handleOpenCreate = () => {
     setEditingId(null);
@@ -183,6 +367,10 @@ export default function ShortLinksAdminPage() {
       await deleteShortLink(id);
       fetchShortLinks();
     }
+  };
+
+  const handleOpenDownloadModal = (shortCode: string, shortUrl: string, defaultSize: number) => {
+    setDownloadConfig({ shortCode, shortUrl, defaultSize });
   };
 
   if (isLoading) return <Loading fullScreen />;
@@ -344,9 +532,9 @@ export default function ShortLinksAdminPage() {
                       includeMargin
                       level='H'
                       imageSettings={{
-                        src: '/images/jmmi-logo.png',
-                        height: 44,
-                        width: 44,
+                        src: QR_LOGO_SRC,
+                        height: getQrLogoSize(220, logoAspectRatio).height,
+                        width: getQrLogoSize(220, logoAspectRatio).width,
                         excavate: true,
                       }}
                     />
@@ -357,9 +545,9 @@ export default function ShortLinksAdminPage() {
                       level='H'
                       includeMargin
                       imageSettings={{
-                        src: '/images/jmmi-logo.png',
-                        height: 44,
-                        width: 44,
+                        src: QR_LOGO_SRC,
+                        height: getQrLogoSize(220, logoAspectRatio).height,
+                        width: getQrLogoSize(220, logoAspectRatio).width,
                         excavate: true,
                       }}
                     />
@@ -377,7 +565,13 @@ export default function ShortLinksAdminPage() {
                     <Button
                       variant='primary'
                       leftIcon={Download}
-                      onClick={() => downloadQRCode(successLink.short_code, 220)}
+                      onClick={() =>
+                        handleOpenDownloadModal(
+                          successLink.short_code,
+                          buildShortUrl(successLink.short_path),
+                          220,
+                        )
+                      }
                       className='flex-1 justify-center'
                     >
                       Download QR
@@ -458,7 +652,19 @@ export default function ShortLinksAdminPage() {
         <QRModal
           link={viewingQRLink}
           shortUrl={buildShortUrl(viewingQRLink.short_path)}
+          logoAspectRatio={logoAspectRatio}
+          onRequestDownload={handleOpenDownloadModal}
           onClose={() => setViewingQRLink(null)}
+        />
+      )}
+
+      {downloadConfig && (
+        <QRDownloadModal
+          shortCode={downloadConfig.shortCode}
+          shortUrl={downloadConfig.shortUrl}
+          defaultSize={downloadConfig.defaultSize}
+          logoAspectRatio={logoAspectRatio}
+          onClose={() => setDownloadConfig(null)}
         />
       )}
     </div>
