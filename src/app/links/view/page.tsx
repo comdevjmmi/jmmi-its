@@ -270,7 +270,7 @@ function FolderViewContent() {
         </div>
 
         {/* Content container */}
-        <div className='w-full max-w-md space-y-8'>
+        <div className='w-full max-w-md md:max-w-3xl lg:max-w-5xl space-y-8'>
           {/* Folder title */}
           <div className='bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg px-6 py-4 shadow-md text-center'>
             <Typography as='h2' variant='h5' className='text-white font-bold'>

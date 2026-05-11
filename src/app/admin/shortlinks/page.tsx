@@ -297,9 +297,10 @@ function QRModal({ link, shortUrl, logoAspectRatio, onRequestDownload, onClose }
 }
 
 export default function ShortLinksAdminPage() {
+  const [search, setSearch] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
-  const { shortLinks, total, isLoading, refetch } = useGetShortLinks(currentPage, itemsPerPage);
+  const { shortLinks, total, isLoading, refetch } = useGetShortLinks(currentPage, itemsPerPage, search);
   const { mutateAsync: createShortLink } = useCreateShortLink();
   const { mutateAsync: updateShortLink } = useUpdateShortLink();
   const { mutateAsync: deleteShortLink } = useDeleteShortLink();
@@ -377,7 +378,11 @@ export default function ShortLinksAdminPage() {
 
   const totalPages = Math.ceil(total / itemsPerPage);
 
-  if (isLoading) return <Loading fullScreen />;
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  if (isLoading && shortLinks.length === 0) return <Loading fullScreen />;
 
   return (
     <div className='p-6 max-w-6xl mx-auto'>
@@ -401,6 +406,33 @@ export default function ShortLinksAdminPage() {
       </div>
 
       <div className='bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden'>
+        <div className='border-b border-slate-100 px-6 py-4'>
+          <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+            <div className='relative w-full sm:max-w-md'>
+              <input
+                type='text'
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder='Cari short code atau target URL...'
+                className='w-full rounded-xl border border-slate-300 px-4 py-2.5 pl-11 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+              />
+              <svg
+                aria-hidden='true'
+                viewBox='0 0 24 24'
+                className='pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400'
+              >
+                <path
+                  fill='currentColor'
+                  d='M10 4a6 6 0 104.472 10.028l4.75 4.75 1.414-1.414-4.75-4.75A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z'
+                />
+              </svg>
+            </div>
+            <span className='rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700'>
+              {total} link
+            </span>
+          </div>
+        </div>
+
         <table className='w-full text-left'>
           <thead>
             <tr className='bg-slate-50 border-b border-slate-100'>
@@ -412,7 +444,13 @@ export default function ShortLinksAdminPage() {
             </tr>
           </thead>
           <tbody className='divide-y divide-slate-100'>
-            {shortLinks.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className='px-6 py-12 text-center text-slate-400'>
+                  Memuat data...
+                </td>
+              </tr>
+            ) : shortLinks.length === 0 ? (
               <tr>
                 <td colSpan={5} className='px-6 py-12 text-center text-slate-400'>
                   Belum ada short link.

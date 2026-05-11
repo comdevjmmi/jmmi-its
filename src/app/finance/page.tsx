@@ -288,7 +288,7 @@ export default function FinancePage() {
       <div className='relative z-10 flex flex-col items-center px-4 py-8 sm:py-12'>
         <ProfileHeader />
 
-        <div className='w-full max-w-xl space-y-6'>
+        <div className='w-full max-w-xl md:max-w-4xl lg:max-w-6xl space-y-6'>
           <div className='text-center'>
             <Typography as='h1' variant='h5' className='text-white'>
               Transparansi Keuangan

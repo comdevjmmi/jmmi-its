@@ -93,7 +93,7 @@ export default function LinksPage() {
         <ProfileHeader />
 
         {/* Content container */}
-        <div className='w-full max-w-md space-y-8'>
+        <div className='w-full max-w-md md:max-w-3xl lg:max-w-5xl space-y-8'>
           {/* Static About Link */}
           <div className='space-y-4'>
             <div className='space-y-3'>
@@ -177,7 +177,7 @@ export default function LinksPage() {
                   </div>
                 )}
 
-                <div className='space-y-3'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
                   {categoryFolders?.map((folder) => (
                     <FolderCard
                       key={folder.folder_id}
@@ -207,7 +207,7 @@ export default function LinksPage() {
                   </Typography>
                 </div>
               </div>
-              <div className='space-y-3'>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
                 {foldersByCategory.uncategorized.map((folder) => (
                   <FolderCard
                     key={folder.folder_id}

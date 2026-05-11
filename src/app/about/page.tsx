@@ -37,7 +37,7 @@ export default function AboutPage() {
         </button>
       </div>
 
-      <div className='relative z-10 flex flex-col items-center px-6 py-8 sm:py-12 max-w-md mx-auto'>
+      <div className='relative z-10 flex flex-col items-center px-6 py-8 sm:py-12 max-w-md md:max-w-2xl lg:max-w-4xl mx-auto'>
         {/* Profile Section Reusable Component */}
         <ProfileHeader />
 

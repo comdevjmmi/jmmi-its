@@ -24,17 +24,17 @@ export interface UpdateShortLinkRequest {
   url?: string;
 }
 
-export const useGetShortLinks = (page = 1, limit = 10) => {
+export const useGetShortLinks = (page = 1, limit = 10, search = '') => {
   const {
     data: shortLinksData,
     isLoading,
     isError,
     refetch,
   } = useQuery<ApiResponse<PaginatedShortLinks>, AxiosError<ApiError>>({
-    queryKey: ['shortlinks', page, limit],
+    queryKey: ['shortlinks', page, limit, search],
     queryFn: async () => {
       const res = await api.get<ApiResponse<PaginatedShortLinks>>('/shortlinks', {
-        params: { page, limit },
+        params: { page, limit, search },
       });
       return res.data;
     },

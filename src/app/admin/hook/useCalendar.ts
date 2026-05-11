@@ -7,15 +7,24 @@ import {
   UpdateCalendarEventRequest,
 } from '@/types/entities/calendar';
 
-export function useGetAllCalendarEvents() {
+export interface PaginatedCalendarEvents {
+  data: CalendarEvent[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export function useGetAllCalendarEvents(page = 1, limit = 8, search = '') {
   return useQuery({
-    queryKey: ['calendar-events-admin'],
+    queryKey: ['calendar-events-admin', page, limit, search],
     queryFn: async () => {
       const response = await api.get<{
         status: boolean;
         message: string;
-        data: CalendarEvent[];
-      }>('/calendar/admin/events');
+        data: PaginatedCalendarEvents;
+      }>('/calendar/admin/events', {
+        params: { page, limit, search },
+      });
       return response.data.data;
     },
   });

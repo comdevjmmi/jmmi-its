@@ -52,7 +52,7 @@ export default function AnnouncementPage() {
       <div className='flex flex-col items-center px-4 py-8 sm:py-12 min-h-screen'>
         <AnnouncementHeader />
 
-        <div className='w-full max-w-md space-y-8'>
+        <div className='w-full max-w-md md:max-w-2xl lg:max-w-4xl space-y-8'>
           {view === 'form' ? (
             <AnnouncementForm onSubmit={handleCheck} isLoading={isPending} />
           ) : (

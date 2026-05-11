@@ -5,7 +5,13 @@ import { Edit2, Plus, Trash2 } from 'lucide-react';
 
 import Button from '@/components/buttons/Button';
 import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
-import { useGetAllFinanceTransactions, useCreateFinanceTransaction, useUpdateFinanceTransaction, useDeleteFinanceTransaction } from '../hook/useFinance';
+import {
+  useGetAllFinanceTransactions,
+  useCreateFinanceTransaction,
+  useUpdateFinanceTransaction,
+  useDeleteFinanceTransaction,
+  useGetFinanceReport,
+} from '../hook/useFinance';
 
 interface FinanceTransaction {
   transaction_id: string;
@@ -41,7 +47,11 @@ export default function AdminKeuanganPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { data: transactions = [], isLoading, refetch } = useGetAllFinanceTransactions();
+  const { data: paginationData, isLoading: isTransactionsLoading, refetch } = useGetAllFinanceTransactions(currentPage, itemsPerPage);
+  const { data: reportData, isLoading: isReportLoading } = useGetFinanceReport();
+  
+  const transactions = paginationData?.data || [];
+  const totalTransactions = paginationData?.total || 0;
   const { mutate: createTransaction, isPending: isCreating } = useCreateFinanceTransaction();
   const { mutate: updateTransaction, isPending: isUpdating } = useUpdateFinanceTransaction();
   const { mutate: deleteTransaction, isPending: isDeleting } = useDeleteFinanceTransaction();
@@ -140,16 +150,11 @@ export default function AdminKeuanganPage() {
     });
   };
 
-  const totalIncome = transactions
-    .filter((transaction) => transaction.type === 'income')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const totalExpense = transactions
-    .filter((transaction) => transaction.type === 'expenses')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const balance = totalIncome - totalExpense;
+  const totalIncome = reportData?.total_income || 0;
+  const totalExpense = reportData?.total_expense || 0;
+  const balance = reportData?.current_balance || 0;
 
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
-  const paginatedTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(totalTransactions / itemsPerPage);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -197,7 +202,7 @@ export default function AdminKeuanganPage() {
           </Button>
         </div>
 
-        {isLoading ? (
+        {isTransactionsLoading || isReportLoading ? (
           <div className='px-6 py-8 text-center text-slate-500'>Memuat transaksi...</div>
         ) : transactions.length === 0 ? (
           <div className='px-6 py-8 text-center text-slate-500'>Belum ada transaksi. Mulai dengan menambahkan transaksi baru.</div>
@@ -214,7 +219,7 @@ export default function AdminKeuanganPage() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <tr key={transaction.transaction_id} className='border-b border-slate-100 transition-colors hover:bg-slate-50'>
                     <td className='px-6 py-4 text-sm text-slate-600'>
                       {new Date(transaction.transaction_date).toLocaleDateString('id-ID')}

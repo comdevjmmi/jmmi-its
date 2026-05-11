@@ -77,45 +77,14 @@ export default function AdminCalendarPage() {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: events = [], isLoading } = useGetAllCalendarEvents();
+  const { data: paginationData, isLoading } = useGetAllCalendarEvents(currentPage, PAGE_SIZE, search);
+  const events = paginationData?.data || [];
+  const totalEvents = paginationData?.total || 0;
   const createMutation = useCreateCalendarEvent();
   const updateMutation = useUpdateCalendarEvent();
   const deleteMutation = useDeleteCalendarEvent();
 
-  const sortedEvents = useMemo(() => {
-    return [...events].sort((left, right) => {
-      const dateDiff = new Date(left.event_date).getTime() - new Date(right.event_date).getTime();
-      if (dateDiff !== 0) return dateDiff;
-      return left.event_time.localeCompare(right.event_time);
-    });
-  }, [events]);
-
-  const filteredEvents = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
-
-    if (!keyword) {
-      return sortedEvents;
-    }
-
-    return sortedEvents.filter((event) => {
-      const haystack = [
-        event.event_name,
-        event.location,
-        event.notes ?? '',
-        event.recurrence_type ?? '',
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return haystack.includes(keyword);
-    });
-  }, [search, sortedEvents]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE));
-  const visibleEvents = useMemo(() => {
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
-    return filteredEvents.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [currentPage, filteredEvents]);
+  const totalPages = Math.max(1, Math.ceil(totalEvents / PAGE_SIZE));
 
   useEffect(() => {
     setCurrentPage(1);
@@ -257,18 +226,18 @@ export default function AdminCalendarPage() {
             </div>
 
             <span className='rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700'>
-              {filteredEvents.length} event
+              {totalEvents} event
             </span>
           </div>
         </div>
 
         {isLoading ? (
           <div className='px-6 py-8 text-center text-slate-500'>Memuat event...</div>
-        ) : filteredEvents.length === 0 ? (
+        ) : events.length === 0 ? (
           <div className='px-6 py-8 text-center text-slate-500'>Belum ada event pada kalender.</div>
         ) : (
           <div className='divide-y divide-slate-100'>
-            {visibleEvents.map((event) => (
+            {events.map((event) => (
               <article key={event.event_id} className='px-6 py-5'>
                 <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
                   <div className='space-y-3'>
@@ -330,11 +299,11 @@ export default function AdminCalendarPage() {
           </div>
         )}
 
-        {filteredEvents.length > 0 && (
+        {totalEvents > 0 && (
           <div className='flex flex-col gap-3 border-t border-slate-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between'>
             <p className='text-sm text-slate-600'>
-              Menampilkan {Math.min((currentPage - 1) * PAGE_SIZE + 1, filteredEvents.length)}-
-              {Math.min(currentPage * PAGE_SIZE, filteredEvents.length)} dari {filteredEvents.length} event
+              Menampilkan {Math.min((currentPage - 1) * PAGE_SIZE + 1, totalEvents)}-
+              {Math.min(currentPage * PAGE_SIZE, totalEvents)} dari {totalEvents} event
             </p>
 
             <div className='flex items-center gap-2'>
