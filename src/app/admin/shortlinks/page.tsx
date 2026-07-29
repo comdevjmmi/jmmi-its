@@ -292,7 +292,7 @@ function QRModal({ link, shortUrl, logoAspectRatio, onRequestDownload, onClose }
           </Button>
         </div>
       </div>
-    </div>
+    </div> 
   );
 }
 

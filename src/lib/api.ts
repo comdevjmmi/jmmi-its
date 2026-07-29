@@ -7,36 +7,14 @@ import { getToken, removeToken, removeRefreshToken } from '@/lib/cookies';
 import { UninterceptedApiError } from '@/types/api';
 const context = <GetServerSidePropsContext>{};
 
-const rawBaseURL =
-  process.env.NEXT_PUBLIC_RUN_MODE === 'development'
-    ? process.env.NEXT_PUBLIC_API_URL_DEV
-    : process.env.NEXT_PUBLIC_API_URL_PROD;
-
-const normalizeApiBase = (raw?: string): string => {
-  // default to local dev API
-  if (!raw) return 'http://localhost:3333/api';
-
-  // Guard local development from accidental HTTPS localhost misconfiguration.
-  let base = raw.replace('https://localhost:3333', 'http://localhost:3333');
-
-  // trim trailing slashes
-  base = base.replace(/\/+$/, '');
-  // If a relative path like `/api` is provided, convert to absolute in browser
-  if (base.startsWith('/')) {
-    if (typeof window !== 'undefined' && window.location) {
-      return `${window.location.origin}${base}`;
-    }
-    // server-side fallback to localhost
-    return `http://localhost:3333${base}`;
+function resolveBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/api`;
   }
+  return 'http://localhost:3000/api';
+}
 
-  // ensure the path includes /api
-  if (!base.endsWith('/api')) base = `${base}/api`;
-
-  return base;
-};
-
-export const baseURL = normalizeApiBase(rawBaseURL);
+export const baseURL = resolveBaseUrl();
 
 export const api = axios.create({
   baseURL,
