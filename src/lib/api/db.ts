@@ -10,6 +10,11 @@ if (!connectionString) {
   );
 }
 
+// Allow self-signed certificate chain for Supabase database pooler
+if (process.env.NODE_ENV === 'production' || connectionString.includes('supabase')) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 const pool = new Pool({
   connectionString,
   ssl: {
