@@ -7,13 +7,8 @@ publish = "out"
 NODE_VERSION = "20.10.0"
 
 [[redirects]]
-  from = "/"
-  to = "/links"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/s/:shortCode"
   to = "https://api.jmmi-its.my.id/s/:shortCode"
   status = 200
   force = true
+
