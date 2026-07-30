@@ -57,8 +57,10 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const serverMessage = error.response?.data?.message;
     const messageStr = typeof serverMessage === 'string' ? serverMessage : '';
+    const isLoginEndpoint = error.config?.url?.includes('/auth/login');
     if (
       typeof window !== 'undefined' &&
+      !isLoginEndpoint &&
       (status === 401 || /expired|invalid/i.test(messageStr))
     ) {
       try {
