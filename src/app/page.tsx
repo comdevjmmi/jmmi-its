@@ -15,12 +15,10 @@ import LinksLayoutWrapper from '@/components/links/LinksLayoutWrapper';
 import NextImage from '@/components/NextImage';
 import Typography from '@/components/Typography';
 
-import { siteConfig } from '@/constant/config';
-
 export const metadata: Metadata = {
   title: 'Beranda',
   description:
-    'Portal resmi JMMI ITS untuk mengenal visi-misi, memantau kegiatan, dan mengakses informasi utama organisasi.',
+    'Website resmi JMMI ITS untuk mengenal visi-misi, memantau kegiatan, dan mengakses informasi utama organisasi.',
 };
 
 const highlights = [
@@ -48,7 +46,7 @@ const highlights = [
   {
     title: 'Pusat tautan',
     description:
-      'Masuk ke portal tautan resmi untuk dokumen, layanan, dan informasi terbaru.',
+      'Akses tautan resmi untuk dokumen, layanan, dan informasi terbaru.',
     href: '/links',
     icon: Globe2,
   },
@@ -89,7 +87,7 @@ export default function HomePage() {
               font='marquisette'
               className='mt-5 max-w-xl text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]'
             >
-              Pusat dakwah, layanan, dan informasi publik JMMI ITS.
+              Pusat informasi publik & layanan JMMI ITS.
             </Typography>
 
             <Typography
@@ -97,9 +95,8 @@ export default function HomePage() {
               variant='body'
               className='mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg'
             >
-              {siteConfig.description} Hadir sebagai ruang yang progresif,
-              akuntabel, sistematis, dan resilien untuk menjembatani publik ke
-              agenda, transparansi, dan tautan resmi organisasi.
+              Halaman publik ini menyajikan informasi resmi, profil, agenda kegiatan,
+              dan transparansi organisasi. Portal kelola internal khusus diakses oleh tim internal JMMI ITS.
             </Typography>
 
             <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
@@ -107,7 +104,7 @@ export default function HomePage() {
                 href='/links'
                 className='inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-5 py-3 text-sm font-semibold text-brand-black transition-transform hover:-translate-y-0.5 hover:bg-brand-yellow/90'
               >
-                Masuk ke portal
+                Lihat pusat tautan
                 <ArrowRight className='h-4 w-4' />
               </Link>
               <Link
