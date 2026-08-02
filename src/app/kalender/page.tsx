@@ -612,7 +612,7 @@ export default function CalendarPage() {
             </div>
           )}
 
-          <BackButton href='/links' />
+          <BackButton href='/' />
         </div>
       </div>
     </LinksLayoutWrapper>

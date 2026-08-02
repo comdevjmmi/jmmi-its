@@ -120,7 +120,7 @@ export default function AboutPage() {
         </div>
 
         {/* Back Button Reusable Component */}
-        <BackButton href='/links' />
+        <BackButton href='/' />
       </div>
     </LinksLayoutWrapper>
   );

@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import Link from 'next/link';
+
 import Loading from '@/components/Loading';
 import LinksLayoutWrapper from '@/components/links/LinksLayoutWrapper';
 import ProfileHeader from '@/components/links/ProfileHeader';
@@ -368,15 +370,15 @@ export default function FinancePage() {
           </div>
 
           <div className='pt-4'>
-            <a
-              href='/links'
+            <Link
+              href='/'
               className='flex items-center justify-center gap-2 text-white hover:text-gray-300 transition-colors'
             >
               <IoChevronBack className='w-5 h-5' />
               <Typography as='span' variant='body' weight='medium'>
-                Kembali
+                Kembali ke Beranda
               </Typography>
-            </a>
+            </Link>
           </div>
         </div>
 
