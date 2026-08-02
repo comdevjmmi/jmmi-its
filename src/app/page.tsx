@@ -96,7 +96,7 @@ export default function HomePage() {
               className='mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg'
             >
               Halaman publik ini menyajikan informasi resmi, profil, agenda kegiatan,
-              dan transparansi organisasi. Portal kelola internal khusus diakses oleh tim internal JMMI ITS.
+              dan transparansi organisasi Jamaah Masjid Manarul Ilmi ITS.
             </Typography>
 
             <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
