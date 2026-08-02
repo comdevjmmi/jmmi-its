@@ -101,21 +101,8 @@ export default function HomePage() {
 
             <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
               <Link
-                href='/links'
-                className='inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-5 py-3 text-sm font-semibold text-brand-black transition-transform hover:-translate-y-0.5 hover:bg-brand-yellow/90'
-              >
-                Lihat pusat tautan
-                <ArrowRight className='h-4 w-4' />
-              </Link>
-              <Link
-                href='/kalender'
-                className='inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15'
-              >
-                Lihat kalender
-              </Link>
-              <Link
                 href='/about'
-                className='inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white/80 transition-colors hover:text-white'
+                className='inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15'
               >
                 Tentang JMMI
               </Link>
@@ -211,47 +198,6 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className='pb-10 pt-14 sm:pb-14'>
-          <div className='mb-6 flex items-center justify-between gap-4 text-white'>
-            <div>
-              <Typography as='h2' variant='h6' font='marquisette' className='text-white'>
-                Jalur utama
-              </Typography>
-              <p className='mt-1 text-sm text-white/75'>
-                Pilih jalur masuk sesuai kebutuhan informasi.
-              </p>
-            </div>
-          </div>
-
-          <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
-            {highlights.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.title}
-                  href={item.href}
-                  className='group rounded-3xl border border-white/15 bg-white/10 p-5 text-white shadow-lg backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:bg-white/15'
-                >
-                  <div className='flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-yellow text-brand-black'>
-                    <Icon className='h-5 w-5' />
-                  </div>
-                  <Typography as='h3' variant='h6' font='marquisette' className='mt-4 text-white'>
-                    {item.title}
-                  </Typography>
-                  <p className='mt-2 text-sm leading-relaxed text-white/75'>
-                    {item.description}
-                  </p>
-                  <div className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-yellow'>
-                    Buka halaman
-                    <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-1' />
-                  </div>
-                </Link>
-              );
-            })}
           </div>
         </section>
 
