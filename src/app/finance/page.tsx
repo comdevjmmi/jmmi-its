@@ -313,7 +313,7 @@ export default function FinancePage() {
             </Typography>
           </div>
 
-          <div className={`grid grid-cols-1 md:grid-cols-3 ${hasUnassigned ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <FundSectionCard
               sectionTitle='Dana Kas'
               income={kasSummary.total_income}
@@ -328,17 +328,6 @@ export default function FinancePage() {
               balance={takmirSummary.balance}
               headerBg='bg-gradient-to-r from-cyan-600 to-blue-600'
             />
-
-            {hasUnassigned && (
-              <FundSectionCard
-                sectionTitle='Belum Ditentukan'
-                income={unassignedSummary.total_income}
-                expense={unassignedSummary.total_expense}
-                balance={unassignedSummary.balance}
-                headerBg='bg-gradient-to-r from-amber-600 to-orange-600'
-              />
-            )}
-
             <FundSectionCard
               sectionTitle='Total Keseluruhan'
               income={data?.total_income ?? 0}

@@ -258,9 +258,30 @@ export default function AdminKeuanganPage() {
                       </span>
                     </td>
                     <td className='px-6 py-4 text-sm'>
-                      <span className='inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700'>
-                        {formatFundType(transaction.fund_type)}
-                      </span>
+                      <select
+                        value={transaction.fund_type || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const newFundType: FundType = value ? (value as FundType) : null;
+                          updateTransaction(
+                            { id: transaction.transaction_id, fund_type: newFundType },
+                            {
+                              onSuccess: () => {
+                                showToast('Tipe dana berhasil diperbarui', SUCCESS_TOAST);
+                                refetch();
+                              },
+                              onError: (error: any) => {
+                                showToast(error.response?.data?.message || 'Gagal memperbarui tipe dana', DANGER_TOAST);
+                              },
+                            }
+                          );
+                        }}
+                        className='rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-400 focus:border-brand-green-700 focus:outline-none focus:ring-2 focus:ring-brand-green-700/20'
+                      >
+                        <option value='DANA_KAS'>Dana Kas</option>
+                        <option value='DANA_TAKMIR'>Dana Takmir</option>
+                        <option value=''>Belum Ditentukan</option>
+                      </select>
                     </td>
                     <td className='px-6 py-4 text-sm text-slate-900'>{transaction.description}</td>
                     <td className='px-6 py-4 text-right text-sm font-medium text-slate-900'>
