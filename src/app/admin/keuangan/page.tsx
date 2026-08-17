@@ -276,11 +276,23 @@ export default function AdminKeuanganPage() {
                             }
                           );
                         }}
-                        className='rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-400 focus:border-brand-green-700 focus:outline-none focus:ring-2 focus:ring-brand-green-700/20'
+                        className={`rounded-full px-3 py-1 text-xs font-semibold shadow-sm transition-colors border-0 outline-none focus:ring-2 focus:ring-slate-400 cursor-pointer ${
+                          transaction.fund_type === 'DANA_KAS'
+                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                            : transaction.fund_type === 'DANA_TAKMIR'
+                            ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                            : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                        }`}
                       >
-                        <option value='DANA_KAS'>Dana Kas</option>
-                        <option value='DANA_TAKMIR'>Dana Takmir</option>
-                        <option value=''>Belum Ditentukan</option>
+                        <option value='DANA_KAS' className='bg-white text-emerald-800 font-medium'>
+                          Dana Kas
+                        </option>
+                        <option value='DANA_TAKMIR' className='bg-white text-blue-800 font-medium'>
+                          Dana Takmir
+                        </option>
+                        <option value='' className='bg-white text-amber-800 font-medium'>
+                          Belum Ditentukan
+                        </option>
                       </select>
                     </td>
                     <td className='px-6 py-4 text-sm text-slate-900'>{transaction.description}</td>
