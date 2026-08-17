@@ -10,14 +10,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id } = await params;
-    const { type, description, amount, transaction_at } = await req.json();
+    const { type, fund_type, description, amount, transaction_at } = await req.json();
 
     const data = await service.updateTransaction(
       id,
       type,
       description,
       amount,
-      transaction_at ? new Date(transaction_at) : undefined
+      transaction_at ? new Date(transaction_at) : undefined,
+      fund_type
     );
 
     if (!data) {

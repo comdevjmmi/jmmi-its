@@ -11,6 +11,11 @@ enum FinanceType {
   expenses
 }
 
+enum FundType {
+  DANA_KAS
+  DANA_TAKMIR
+}
+
 model Category {
   id        String   @id @default(uuid())
   title     String
@@ -90,6 +95,7 @@ model StaffAnnouncement {
 model FinanceTransaction {
   id            String      @id @default(uuid())
   type          FinanceType
+  fundType      FundType?   @map("fund_type")
   description   String
   amount        Int
   transactionAt DateTime    @map("transaction_at")
@@ -98,6 +104,7 @@ model FinanceTransaction {
 
   @@index([transactionAt])
   @@index([type])
+  @@index([fundType])
   @@map("finance_transactions")
 }
 

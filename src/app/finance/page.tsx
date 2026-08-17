@@ -13,7 +13,7 @@ import { IoChevronBack } from 'react-icons/io5';
 
 import { useGetFinanceReport, useGetFinanceTransactions } from '@/app/finance/hook/useFinance';
 
-import { FinanceTransaction } from '@/types/entities/finance';
+import { FinanceTransaction, FundType } from '@/types/entities/finance';
 
 const currencyFormatter = new Intl.NumberFormat('id-ID', {
   style: 'currency',
@@ -25,49 +25,37 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'medium',
 });
 
-type WeeklyPoint = {
+type MonthlyPoint = {
   key: string;
   label: string;
-  weekdayLabel: string;
+  monthLabel: string;
   income: number;
   expenses: number;
   balance: number;
 };
 
-// --- Utilities for Chart ---
-function startOfDay(date: Date) {
-  const next = new Date(date);
-  next.setHours(0, 0, 0, 0);
-  return next;
+function getFundBadgeLabel(fundType: FundType) {
+  if (fundType === 'DANA_KAS') return 'Dana Kas';
+  if (fundType === 'DANA_TAKMIR') return 'Dana Takmir';
+  return 'Belum Ditentukan';
 }
 
-function addDays(date: Date, amount: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + amount);
-  return next;
-}
+function buildMonthlySeries(transactions: FinanceTransaction[]) {
+  const today = new Date();
+  const months: { year: number; month: number }[] = [];
 
-function getDateKey(date: Date) {
-  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-}
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() });
+  }
 
-function formatDateLabel(date: Date) {
-  return date.toLocaleDateString('id-ID', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
-}
-
-function buildWeeklySeries(transactions: FinanceTransaction[]) {
-  const today = startOfDay(new Date());
   const lookup = new Map<string, { income: number; expenses: number }>();
 
   transactions.forEach((transaction) => {
     const date = new Date(transaction.transaction_date);
     if (Number.isNaN(date.getTime())) return;
 
-    const key = getDateKey(startOfDay(date));
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     const current = lookup.get(key) ?? { income: 0, expenses: 0 };
 
     if (transaction.type === 'income') {
@@ -79,17 +67,17 @@ function buildWeeklySeries(transactions: FinanceTransaction[]) {
     lookup.set(key, current);
   });
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = addDays(today, index - 6);
-    const key = getDateKey(date);
+  return months.map(({ year, month }) => {
+    const date = new Date(year, month, 1);
+    const key = `${year}-${String(month + 1).padStart(2, '0')}`;
     const current = lookup.get(key) ?? { income: 0, expenses: 0 };
+    const monthLabel = date.toLocaleDateString('id-ID', { month: 'short' });
+    const fullLabel = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
     return {
       key,
-      label: formatDateLabel(date),
-      weekdayLabel: date
-        .toLocaleDateString('id-ID', { weekday: 'short' })
-        .replace('.', ''),
+      label: fullLabel,
+      monthLabel,
       income: current.income,
       expenses: current.expenses,
       balance: current.income - current.expenses,
@@ -103,7 +91,7 @@ function buildPath(points: { x: number; y: number }[]) {
     .join(' ');
 }
 
-function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
+function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
   const width = 720;
   const height = 300;
   const paddingX = 44;
@@ -113,7 +101,7 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
   const maxValue = Math.max(1, ...data.flatMap((item) => [item.income, item.expenses]));
   const stepX = data.length > 1 ? innerWidth / (data.length - 1) : innerWidth;
 
-  const seriesToPoints = (selector: (item: WeeklyPoint) => number) => {
+  const seriesToPoints = (selector: (item: MonthlyPoint) => number) => {
     return data.map((item, index) => {
       const value = selector(item);
       const x = paddingX + stepX * index;
@@ -138,9 +126,9 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
       <div className='flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between'>
         <div>
           <p className='text-sm font-semibold uppercase tracking-[0.2em] text-emerald-400'>
-            Grafik keuangan 7 hari
+            Grafik Keuangan Bulanan (12 Bulan)
           </p>
-          <h2 className='mt-1 text-2xl font-semibold text-white'>Tren pemasukan dan pengeluaran</h2>
+          <h2 className='mt-1 text-2xl font-semibold text-white'>Tren Pemasukan dan Pengeluaran</h2>
         </div>
         <div className='flex flex-wrap gap-3 text-sm'>
           <div className='inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-emerald-300'>
@@ -176,27 +164,27 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
           ))}
 
           <path d={incomeAreaPath} fill='url(#incomeFillDark)' />
-          <path d={incomePath} fill='none' stroke='rgb(52 211 153)' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' />
-          <path d={expensePath} fill='none' stroke='rgb(251 113 133)' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='12 8' />
+          <path d={incomePath} fill='none' stroke='rgb(52 211 153)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
+          <path d={expensePath} fill='none' stroke='rgb(251 113 133)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
 
           {incomePoints.map((point, index) => (
             <g key={`income-${data[index]?.key ?? index}`}>
-              <circle cx={point.x} cy={point.y} r='5.5' fill='#1e293b' stroke='rgb(52 211 153)' strokeWidth='3' />
-              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgba(255, 255, 255, 0.7)' fontSize='12'>
-                {data[index]?.weekdayLabel}
+              <circle cx={point.x} cy={point.y} r='4.5' fill='#1e293b' stroke='rgb(52 211 153)' strokeWidth='2.5' />
+              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgba(255, 255, 255, 0.7)' fontSize='11'>
+                {data[index]?.monthLabel}
               </text>
             </g>
           ))}
         </svg>
       </div>
 
-      <div className='mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-        {data.map((item) => (
-          <div key={item.key} className='rounded-2xl border border-white/10 bg-white/5 px-4 py-3'>
-            <p className='text-sm font-medium text-white/90'>{item.label}</p>
-            <div className='mt-2 space-y-1 text-sm'>
-              <p className='text-emerald-400'>Masuk {currencyFormatter.format(item.income)}</p>
-              <p className='text-rose-400'>Keluar {currencyFormatter.format(item.expenses)}</p>
+      <div className='mt-4 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
+        {data.slice(-6).map((item) => (
+          <div key={item.key} className='rounded-xl border border-white/10 bg-white/5 px-3 py-2.5'>
+            <p className='text-xs font-semibold text-white/90 truncate'>{item.label}</p>
+            <div className='mt-1 space-y-0.5 text-xs'>
+              <p className='text-emerald-400'>+{currencyFormatter.format(item.income)}</p>
+              <p className='text-rose-400'>-{currencyFormatter.format(item.expenses)}</p>
             </div>
           </div>
         ))}
@@ -205,23 +193,38 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
   );
 }
 
-function FinanceSummaryCard({
-  title,
-  value,
-  className,
+function FundSectionCard({
+  sectionTitle,
+  income,
+  expense,
+  balance,
+  headerBg,
 }: {
-  title: string;
-  value: number;
-  className: string;
+  sectionTitle: string;
+  income: number;
+  expense: number;
+  balance: number;
+  headerBg: string;
 }) {
   return (
-    <div className={`rounded-xl p-4 shadow-md ${className}`}>
-      <Typography as='p' variant='body' className='text-white/90'>
-        {title}
-      </Typography>
-      <Typography as='h3' variant='h6' className='text-white mt-1'>
-        {currencyFormatter.format(value)}
-      </Typography>
+    <div className='rounded-2xl border border-white/15 bg-white/5 overflow-hidden shadow-lg'>
+      <div className={`px-4 py-3 font-semibold text-white text-base ${headerBg}`}>
+        {sectionTitle}
+      </div>
+      <div className='p-4 space-y-3'>
+        <div className='flex justify-between items-center text-sm'>
+          <span className='text-white/70'>Pemasukan:</span>
+          <span className='font-semibold text-emerald-400'>{currencyFormatter.format(income)}</span>
+        </div>
+        <div className='flex justify-between items-center text-sm'>
+          <span className='text-white/70'>Pengeluaran:</span>
+          <span className='font-semibold text-rose-400'>{currencyFormatter.format(expense)}</span>
+        </div>
+        <div className='border-t border-white/10 pt-2 flex justify-between items-center text-base font-bold'>
+          <span className='text-white/90'>Saldo:</span>
+          <span className='text-white'>{currencyFormatter.format(balance)}</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -233,16 +236,21 @@ function TransactionRow({ transaction }: { transaction: FinanceTransaction }) {
     <div className='bg-white/10 rounded-lg p-4 border border-white/15'>
       <div className='flex items-start justify-between gap-3'>
         <div>
-          <Typography as='p' variant='body' className='text-white font-medium'>
-            {transaction.description}
-          </Typography>
+          <div className='flex items-center gap-2 flex-wrap'>
+            <Typography as='p' variant='body' className='text-white font-medium'>
+              {transaction.description}
+            </Typography>
+            <span className='text-[10px] px-2 py-0.5 rounded bg-white/20 text-white/90 font-medium'>
+              {getFundBadgeLabel(transaction.fund_type)}
+            </span>
+          </div>
           <Typography as='p' variant='label' className='text-white/75 mt-1'>
             {dateFormatter.format(new Date(transaction.transaction_date))}
           </Typography>
         </div>
 
         <span
-          className={`text-xs px-2 py-1 rounded-full font-semibold ${
+          className={`text-xs px-2.5 py-1 rounded-full font-semibold shrink-0 ${
             isIncome
               ? 'bg-emerald-100 text-emerald-700'
               : 'bg-rose-100 text-rose-700'
@@ -267,14 +275,14 @@ export default function FinancePage() {
   const { data, isLoading: reportLoading, refetch: refetchReport } = useGetFinanceReport();
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
-  const { transactions, total, isLoading: transactionsLoading, refetch: refetchTransactions } = useGetFinanceTransactions(currentPage, itemsPerPage);
+  const { transactions, total, isLoading: transactionsLoading } = useGetFinanceTransactions(currentPage, itemsPerPage);
 
   React.useEffect(() => {
     refetchReport();
   }, [refetchReport]);
 
-  const weeklySeries = React.useMemo(() => {
-    return buildWeeklySeries(data?.transactions ?? []);
+  const monthlySeries = React.useMemo(() => {
+    return buildMonthlySeries(data?.transactions ?? []);
   }, [data?.transactions]);
 
   const totalPages = Math.ceil(total / itemsPerPage);
@@ -284,6 +292,11 @@ export default function FinancePage() {
   if (isLoading) {
     return <Loading fullScreen />;
   }
+
+  const kasSummary = data?.kas_summary ?? { total_income: 0, total_expense: 0, balance: 0 };
+  const takmirSummary = data?.takmir_summary ?? { total_income: 0, total_expense: 0, balance: 0 };
+  const unassignedSummary = data?.unassigned_summary ?? { total_income: 0, total_expense: 0, balance: 0 };
+  const hasUnassigned = unassignedSummary.total_income > 0 || unassignedSummary.total_expense > 0;
 
   return (
     <LinksLayoutWrapper>
@@ -296,30 +309,47 @@ export default function FinancePage() {
               Transparansi Keuangan
             </Typography>
             <Typography as='p' variant='body' className='text-white/80 mt-2'>
-              Laporan pemasukan, pengeluaran, dan saldo berjalan.
+              Laporan pemasukan, pengeluaran, dan saldo Dana Kas & Dana Takmir.
             </Typography>
           </div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-            <FinanceSummaryCard
-              title='Pemasukan'
-              value={data?.total_income ?? 0}
-              className='bg-gradient-to-r from-emerald-500 to-emerald-600'
+          <div className={`grid grid-cols-1 md:grid-cols-3 ${hasUnassigned ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+            <FundSectionCard
+              sectionTitle='Dana Kas'
+              income={kasSummary.total_income}
+              expense={kasSummary.total_expense}
+              balance={kasSummary.balance}
+              headerBg='bg-gradient-to-r from-emerald-600 to-teal-600'
             />
-            <FinanceSummaryCard
-              title='Pengeluaran'
-              value={data?.total_expense ?? 0}
-              className='bg-gradient-to-r from-rose-500 to-rose-600'
+            <FundSectionCard
+              sectionTitle='Dana Takmir'
+              income={takmirSummary.total_income}
+              expense={takmirSummary.total_expense}
+              balance={takmirSummary.balance}
+              headerBg='bg-gradient-to-r from-cyan-600 to-blue-600'
             />
-            <FinanceSummaryCard
-              title='Saldo Saat Ini'
-              value={data?.current_balance ?? 0}
-              className='bg-gradient-to-r from-brand-blue-700 to-brand-blue'
+
+            {hasUnassigned && (
+              <FundSectionCard
+                sectionTitle='Belum Ditentukan'
+                income={unassignedSummary.total_income}
+                expense={unassignedSummary.total_expense}
+                balance={unassignedSummary.balance}
+                headerBg='bg-gradient-to-r from-amber-600 to-orange-600'
+              />
+            )}
+
+            <FundSectionCard
+              sectionTitle='Total Keseluruhan'
+              income={data?.total_income ?? 0}
+              expense={data?.total_expense ?? 0}
+              balance={data?.current_balance ?? 0}
+              headerBg='bg-gradient-to-r from-purple-600 to-indigo-600'
             />
           </div>
 
           <div className='w-full'>
-            <FinanceLineChart data={weeklySeries} />
+            <FinanceLineChart data={monthlySeries} />
           </div>
 
           <div className='space-y-3'>

@@ -14,10 +14,10 @@ import { useGetFinanceReport } from './hook/useFinance';
 import { useGetAllCalendarEvents } from './hook/useCalendar';
 import useAuthStore from '@/stores/useAuthStore';
 
-type WeeklyPoint = {
+type MonthlyPoint = {
   key: string;
   label: string;
-  weekdayLabel: string;
+  monthLabel: string;
   income: number;
   expenses: number;
   balance: number;
@@ -41,8 +41,6 @@ interface FinanceTransaction {
   timestamp: string;
 }
 
-
-
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('id-ID').format(value);
 }
@@ -59,27 +57,22 @@ function addDays(date: Date, amount: number) {
   return next;
 }
 
-function getDateKey(date: Date) {
-  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-}
+function buildMonthlySeries(transactions: FinanceTransaction[]) {
+  const today = new Date();
+  const months: { year: number; month: number }[] = [];
 
-function formatDateLabel(date: Date) {
-  return date.toLocaleDateString('id-ID', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
-}
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() });
+  }
 
-function buildWeeklySeries(transactions: FinanceTransaction[]) {
-  const today = startOfDay(new Date());
   const lookup = new Map<string, { income: number; expenses: number }>();
 
   transactions.forEach((transaction) => {
     const date = new Date(transaction.transaction_date);
     if (Number.isNaN(date.getTime())) return;
 
-    const key = getDateKey(startOfDay(date));
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     const current = lookup.get(key) ?? { income: 0, expenses: 0 };
 
     if (transaction.type === 'income') {
@@ -91,17 +84,17 @@ function buildWeeklySeries(transactions: FinanceTransaction[]) {
     lookup.set(key, current);
   });
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = addDays(today, index - 6);
-    const key = getDateKey(date);
+  return months.map(({ year, month }) => {
+    const date = new Date(year, month, 1);
+    const key = `${year}-${String(month + 1).padStart(2, '0')}`;
     const current = lookup.get(key) ?? { income: 0, expenses: 0 };
+    const monthLabel = date.toLocaleDateString('id-ID', { month: 'short' });
+    const fullLabel = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
     return {
       key,
-      label: formatDateLabel(date),
-      weekdayLabel: date
-        .toLocaleDateString('id-ID', { weekday: 'short' })
-        .replace('.', ''),
+      label: fullLabel,
+      monthLabel,
       income: current.income,
       expenses: current.expenses,
       balance: current.income - current.expenses,
@@ -115,7 +108,7 @@ function buildPath(points: { x: number; y: number }[]) {
     .join(' ');
 }
 
-function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
+function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
   const width = 720;
   const height = 300;
   const paddingX = 44;
@@ -125,7 +118,7 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
   const maxValue = Math.max(1, ...data.flatMap((item) => [item.income, item.expenses]));
   const stepX = data.length > 1 ? innerWidth / (data.length - 1) : innerWidth;
 
-  const seriesToPoints = (selector: (item: WeeklyPoint) => number) => {
+  const seriesToPoints = (selector: (item: MonthlyPoint) => number) => {
     return data.map((item, index) => {
       const value = selector(item);
       const x = paddingX + stepX * index;
@@ -150,9 +143,9 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
       <div className='flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between'>
         <div>
           <p className='text-sm font-semibold uppercase tracking-[0.2em] text-brand-green-700'>
-            Grafik keuangan 7 hari
+            Grafik Keuangan Bulanan (12 Bulan)
           </p>
-          <h2 className='mt-1 text-2xl font-semibold text-slate-900'>Tren pemasukan dan pengeluaran</h2>
+          <h2 className='mt-1 text-2xl font-semibold text-slate-900'>Tren Pemasukan dan Pengeluaran</h2>
         </div>
         <div className='flex flex-wrap gap-3 text-sm'>
           <div className='inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-emerald-700'>
@@ -188,27 +181,27 @@ function FinanceLineChart({ data }: { data: WeeklyPoint[] }) {
           ))}
 
           <path d={incomeAreaPath} fill='url(#incomeFill)' />
-          <path d={incomePath} fill='none' stroke='rgb(5 150 105)' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' />
-          <path d={expensePath} fill='none' stroke='rgb(244 63 94)' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='12 8' />
+          <path d={incomePath} fill='none' stroke='rgb(5 150 105)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
+          <path d={expensePath} fill='none' stroke='rgb(244 63 94)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
 
           {incomePoints.map((point, index) => (
             <g key={`income-${data[index]?.key ?? index}`}>
-              <circle cx={point.x} cy={point.y} r='5.5' fill='white' stroke='rgb(5 150 105)' strokeWidth='3' />
-              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgb(71 85 105)' fontSize='12'>
-                {data[index]?.weekdayLabel}
+              <circle cx={point.x} cy={point.y} r='4.5' fill='white' stroke='rgb(5 150 105)' strokeWidth='2.5' />
+              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgb(71 85 105)' fontSize='11'>
+                {data[index]?.monthLabel}
               </text>
             </g>
           ))}
         </svg>
       </div>
 
-      <div className='mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-        {data.map((item) => (
-          <div key={item.key} className='rounded-2xl border border-slate-200 bg-white px-4 py-3'>
-            <p className='text-sm font-medium text-slate-700'>{item.label}</p>
-            <div className='mt-2 space-y-1 text-sm'>
-              <p className='text-emerald-700'>Masuk Rp {formatCurrency(item.income)}</p>
-              <p className='text-rose-700'>Keluar Rp {formatCurrency(item.expenses)}</p>
+      <div className='mt-4 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
+        {data.slice(-6).map((item) => (
+          <div key={item.key} className='rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs'>
+            <p className='font-semibold text-slate-700 truncate'>{item.label}</p>
+            <div className='mt-1 space-y-0.5 text-xs'>
+              <p className='text-emerald-700'>+Rp {formatCurrency(item.income)}</p>
+              <p className='text-rose-700'>-Rp {formatCurrency(item.expenses)}</p>
             </div>
           </div>
         ))}
@@ -344,7 +337,7 @@ export default function AdminDashboard() {
   const totalExpense = reportData?.total_expense || 0;
   const balance = reportData?.current_balance || 0;
 
-  const weeklySeries = useMemo(() => buildWeeklySeries(transactions), [transactions]);
+  const monthlySeries = useMemo(() => buildMonthlySeries(transactions), [transactions]);
 
   const reminderEvents = useMemo(() => {
     const today = startOfDay(new Date());
@@ -421,7 +414,7 @@ export default function AdminDashboard() {
 
       <div className='grid gap-6 xl:grid-cols-[1fr_1.55fr]'>
         <UpcomingEventCard events={reminderEvents} />
-        <FinanceLineChart data={weeklySeries} />
+        <FinanceLineChart data={monthlySeries} />
       </div>
     </div>
   );

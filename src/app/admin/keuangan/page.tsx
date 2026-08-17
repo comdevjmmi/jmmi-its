@@ -12,10 +12,12 @@ import {
   useDeleteFinanceTransaction,
   useGetFinanceReport,
 } from '../hook/useFinance';
+import { FundType } from '@/types/entities/finance';
 
 interface FinanceTransaction {
   transaction_id: string;
   type: 'income' | 'expenses';
+  fund_type: FundType;
   description: string;
   amount: number;
   transaction_date: string;
@@ -24,6 +26,7 @@ interface FinanceTransaction {
 
 interface FormData {
   type: 'income' | 'expenses';
+  fund_type: 'DANA_KAS' | 'DANA_TAKMIR' | '';
   description: string;
   amount: string;
   transaction_at: string;
@@ -31,6 +34,7 @@ interface FormData {
 
 const INITIAL_FORM: FormData = {
   type: 'income',
+  fund_type: 'DANA_KAS',
   description: '',
   amount: '',
   transaction_at: new Date().toISOString().split('T')[0],
@@ -38,6 +42,12 @@ const INITIAL_FORM: FormData = {
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('id-ID').format(value);
+}
+
+function formatFundType(fundType: FundType) {
+  if (fundType === 'DANA_KAS') return 'Dana Kas';
+  if (fundType === 'DANA_TAKMIR') return 'Dana Takmir';
+  return 'Belum Ditentukan';
 }
 
 export default function AdminKeuanganPage() {
@@ -49,7 +59,7 @@ export default function AdminKeuanganPage() {
 
   const { data: paginationData, isLoading: isTransactionsLoading, refetch } = useGetAllFinanceTransactions(currentPage, itemsPerPage);
   const { data: reportData, isLoading: isReportLoading } = useGetFinanceReport();
-  
+
   const transactions = paginationData?.data || [];
   const totalTransactions = paginationData?.total || 0;
   const { mutate: createTransaction, isPending: isCreating } = useCreateFinanceTransaction();
@@ -74,6 +84,7 @@ export default function AdminKeuanganPage() {
       setEditingId(transaction.transaction_id);
       setFormData({
         type: transaction.type,
+        fund_type: transaction.fund_type || '',
         description: transaction.description,
         amount: transaction.amount.toString(),
         transaction_at: transaction.transaction_date.split('T')[0],
@@ -102,6 +113,7 @@ export default function AdminKeuanganPage() {
 
     const payload = {
       type: formData.type,
+      fund_type: formData.fund_type ? (formData.fund_type as FundType) : null,
       description: formData.description,
       amount: Number(formData.amount),
       transaction_at: formData.transaction_at,
@@ -150,6 +162,8 @@ export default function AdminKeuanganPage() {
     });
   };
 
+  const kasSummary = reportData?.kas_summary || { total_income: 0, total_expense: 0, balance: 0 };
+  const takmirSummary = reportData?.takmir_summary || { total_income: 0, total_expense: 0, balance: 0 };
   const totalIncome = reportData?.total_income || 0;
   const totalExpense = reportData?.total_expense || 0;
   const balance = reportData?.current_balance || 0;
@@ -168,26 +182,35 @@ export default function AdminKeuanganPage() {
         <div>
           <h1 className='text-3xl font-semibold tracking-tight'>Manajemen Keuangan</h1>
           <p className='mt-3 max-w-2xl text-sm leading-7 text-white/80 sm:text-base'>
-            Kelola pemasukan, pengeluaran, dan riwayat transaksi organisasi.
+            Kelola pemasukan, pengeluaran, dan riwayat transaksi organisasi (Dana Kas & Dana Takmir).
           </p>
         </div>
       </section>
 
       <section className='grid gap-4 md:grid-cols-3'>
         <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm font-medium text-slate-500'>Total Pemasukan</p>
-          <p className='mt-2 text-2xl font-semibold text-slate-900'>Rp {formatCurrency(totalIncome)}</p>
-          <p className='mt-2 text-sm text-slate-500'>Akumulasi seluruh pemasukan yang tercatat.</p>
+          <p className='text-sm font-semibold uppercase tracking-wider text-emerald-700'>Dana Kas</p>
+          <p className='mt-2 text-2xl font-semibold text-slate-900'>Rp {formatCurrency(kasSummary.balance)}</p>
+          <div className='mt-3 flex flex-col gap-1 text-xs text-slate-500'>
+            <span>Pemasukan: Rp {formatCurrency(kasSummary.total_income)}</span>
+            <span>Pengeluaran: Rp {formatCurrency(kasSummary.total_expense)}</span>
+          </div>
         </div>
         <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm font-medium text-slate-500'>Total Pengeluaran</p>
-          <p className='mt-2 text-2xl font-semibold text-slate-900'>Rp {formatCurrency(totalExpense)}</p>
-          <p className='mt-2 text-sm text-slate-500'>Akumulasi seluruh pengeluaran yang tercatat.</p>
+          <p className='text-sm font-semibold uppercase tracking-wider text-blue-700'>Dana Takmir</p>
+          <p className='mt-2 text-2xl font-semibold text-slate-900'>Rp {formatCurrency(takmirSummary.balance)}</p>
+          <div className='mt-3 flex flex-col gap-1 text-xs text-slate-500'>
+            <span>Pemasukan: Rp {formatCurrency(takmirSummary.total_income)}</span>
+            <span>Pengeluaran: Rp {formatCurrency(takmirSummary.total_expense)}</span>
+          </div>
         </div>
         <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm font-medium text-slate-500'>Saldo Berjalan</p>
+          <p className='text-sm font-semibold uppercase tracking-wider text-purple-700'>Total Keseluruhan</p>
           <p className='mt-2 text-2xl font-semibold text-slate-900'>Rp {formatCurrency(balance)}</p>
-          <p className='mt-2 text-sm text-slate-500'>Selisih pemasukan dan pengeluaran saat ini.</p>
+          <div className='mt-3 flex flex-col gap-1 text-xs text-slate-500'>
+            <span>Total Masuk: Rp {formatCurrency(totalIncome)}</span>
+            <span>Total Keluar: Rp {formatCurrency(totalExpense)}</span>
+          </div>
         </div>
       </section>
 
@@ -213,6 +236,7 @@ export default function AdminKeuanganPage() {
                 <tr className='border-b border-slate-200 bg-slate-50'>
                   <th className='px-6 py-3 text-left text-xs font-semibold text-slate-700'>Tanggal</th>
                   <th className='px-6 py-3 text-left text-xs font-semibold text-slate-700'>Jenis</th>
+                  <th className='px-6 py-3 text-left text-xs font-semibold text-slate-700'>Tipe Dana</th>
                   <th className='px-6 py-3 text-left text-xs font-semibold text-slate-700'>Keterangan</th>
                   <th className='px-6 py-3 text-right text-xs font-semibold text-slate-700'>Jumlah</th>
                   <th className='px-6 py-3 text-center text-xs font-semibold text-slate-700'>Aksi</th>
@@ -231,6 +255,11 @@ export default function AdminKeuanganPage() {
                         }`}
                       >
                         {transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                      </span>
+                    </td>
+                    <td className='px-6 py-4 text-sm'>
+                      <span className='inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700'>
+                        {formatFundType(transaction.fund_type)}
                       </span>
                     </td>
                     <td className='px-6 py-4 text-sm text-slate-900'>{transaction.description}</td>
@@ -304,7 +333,7 @@ export default function AdminKeuanganPage() {
 
             <form onSubmit={handleSubmit} className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium text-slate-700'>Jenis</label>
+                <label className='block text-sm font-medium text-slate-700'>Jenis Transaksi</label>
                 <select
                   value={formData.type}
                   onChange={(event) => setFormData({ ...formData, type: event.target.value as 'income' | 'expenses' })}
@@ -312,6 +341,19 @@ export default function AdminKeuanganPage() {
                 >
                   <option value='income'>Pemasukan</option>
                   <option value='expenses'>Pengeluaran</option>
+                </select>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-slate-700'>Tipe Dana</label>
+                <select
+                  value={formData.fund_type}
+                  onChange={(event) => setFormData({ ...formData, fund_type: event.target.value as 'DANA_KAS' | 'DANA_TAKMIR' | '' })}
+                  className='mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-green-700 focus:outline-none focus:ring-2 focus:ring-brand-green-700/20'
+                >
+                  <option value='DANA_KAS'>Dana Kas</option>
+                  <option value='DANA_TAKMIR'>Dana Takmir</option>
+                  <option value=''>Belum Ditentukan (null)</option>
                 </select>
               </div>
 

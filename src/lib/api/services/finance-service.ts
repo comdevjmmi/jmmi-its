@@ -3,6 +3,7 @@ import {
   FinanceReportData,
   FinanceTransaction,
   FinanceTransactionModel,
+  FundType,
 } from '../types/finance';
 
 export class FinanceService {
@@ -10,6 +11,7 @@ export class FinanceService {
     return {
       transaction_id: item.id,
       type: item.type,
+      fund_type: item.fundType ?? null,
       description: item.description,
       amount: item.amount,
       transaction_date: item.transactionAt.toISOString(),
@@ -22,22 +24,44 @@ export class FinanceService {
       orderBy: [{ transactionAt: 'desc' }, { createdAt: 'desc' }],
     })) as unknown as FinanceTransactionModel[];
 
-    const totals = records.reduce(
-      (acc, item) => {
-        if (item.type === 'income') {
-          acc.totalIncome += item.amount;
-        } else {
-          acc.totalExpense += item.amount;
-        }
-        return acc;
-      },
-      { totalIncome: 0, totalExpense: 0 }
-    );
+    const kasSummary = { total_income: 0, total_expense: 0, balance: 0 };
+    const takmirSummary = { total_income: 0, total_expense: 0, balance: 0 };
+    const unassignedSummary = { total_income: 0, total_expense: 0, balance: 0 };
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    records.forEach((item) => {
+      const isIncome = item.type === 'income';
+      if (isIncome) {
+        totalIncome += item.amount;
+      } else {
+        totalExpense += item.amount;
+      }
+
+      if (item.fundType === 'DANA_KAS') {
+        if (isIncome) kasSummary.total_income += item.amount;
+        else kasSummary.total_expense += item.amount;
+      } else if (item.fundType === 'DANA_TAKMIR') {
+        if (isIncome) takmirSummary.total_income += item.amount;
+        else takmirSummary.total_expense += item.amount;
+      } else {
+        if (isIncome) unassignedSummary.total_income += item.amount;
+        else unassignedSummary.total_expense += item.amount;
+      }
+    });
+
+    kasSummary.balance = kasSummary.total_income - kasSummary.total_expense;
+    takmirSummary.balance = takmirSummary.total_income - takmirSummary.total_expense;
+    unassignedSummary.balance = unassignedSummary.total_income - unassignedSummary.total_expense;
 
     return {
-      total_income: totals.totalIncome,
-      total_expense: totals.totalExpense,
-      current_balance: totals.totalIncome - totals.totalExpense,
+      total_income: totalIncome,
+      total_expense: totalExpense,
+      current_balance: totalIncome - totalExpense,
+      kas_summary: kasSummary,
+      takmir_summary: takmirSummary,
+      unassigned_summary: unassignedSummary,
       transactions: records.map((item) => this.toTransactionDTO(item)),
     };
   }
@@ -64,11 +88,13 @@ export class FinanceService {
     type: 'income' | 'expenses',
     description: string,
     amount: number,
-    transactionAt: Date
+    transactionAt: Date,
+    fundType?: FundType
   ): Promise<FinanceTransaction> {
     const record = (await prisma.financeTransaction.create({
       data: {
         type,
+        fundType: fundType || null,
         description,
         amount,
         transactionAt,
@@ -83,13 +109,15 @@ export class FinanceService {
     type?: 'income' | 'expenses',
     description?: string,
     amount?: number,
-    transactionAt?: Date
+    transactionAt?: Date,
+    fundType?: FundType
   ): Promise<FinanceTransaction | null> {
     const data: Record<string, unknown> = {};
-    if (type) data.type = type;
-    if (description) data.description = description;
-    if (amount) data.amount = amount;
-    if (transactionAt) data.transactionAt = transactionAt;
+    if (type !== undefined) data.type = type;
+    if (fundType !== undefined) data.fundType = fundType;
+    if (description !== undefined) data.description = description;
+    if (amount !== undefined) data.amount = amount;
+    if (transactionAt !== undefined) data.transactionAt = transactionAt;
 
     const record = (await prisma.financeTransaction.update({
       where: { id },

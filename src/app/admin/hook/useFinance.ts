@@ -1,9 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { FundBreakdown, FundType } from '@/types/entities/finance';
 
 interface FinanceTransaction {
   transaction_id: string;
   type: 'income' | 'expenses';
+  fund_type: FundType;
   description: string;
   amount: number;
   transaction_date: string;
@@ -12,6 +14,7 @@ interface FinanceTransaction {
 
 interface CreateTransactionRequest {
   type: 'income' | 'expenses';
+  fund_type?: FundType;
   description: string;
   amount: number;
   transaction_at: string;
@@ -21,6 +24,9 @@ export interface FinanceReportData {
   total_income: number;
   total_expense: number;
   current_balance: number;
+  kas_summary: FundBreakdown;
+  takmir_summary: FundBreakdown;
+  unassigned_summary: FundBreakdown;
   transactions: FinanceTransaction[];
 }
 
@@ -79,6 +85,7 @@ export function useUpdateFinanceTransaction() {
     mutationFn: async (data: {
       id: string;
       type?: 'income' | 'expenses';
+      fund_type?: FundType;
       description?: string;
       amount?: number;
       transaction_at?: string;

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (auth instanceof NextResponse) return auth;
 
   try {
-    const { type, description, amount, transaction_at } = await req.json();
+    const { type, fund_type, description, amount, transaction_at } = await req.json();
 
     if (!type || !description || !amount || !transaction_at) {
       return NextResponse.json(
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await service.createTransaction(type, description, amount, new Date(transaction_at));
+    const data = await service.createTransaction(type, description, amount, new Date(transaction_at), fund_type);
 
     return NextResponse.json({ status: true, message: 'Transaction created successfully', data }, { status: 201 });
   } catch (error) {
