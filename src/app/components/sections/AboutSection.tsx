@@ -85,13 +85,13 @@ export default function AboutSection({
                 : 'opacity-0 translate-x-12 scale-95'
             }`}
           >
-            <div className='relative group overflow-hidden rounded-[25px] border border-gray-100 shadow-xl bg-gray-100 aspect-[4/3]'>
+            <div className='relative group overflow-hidden rounded-[25px] border border-gray-100 shadow-xl bg-gray-100 w-full aspect-[4/3]'>
               <NextImage
                 src={aboutImage}
                 alt={aboutTitle}
                 width={600}
                 height={450}
-                className='h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
+                className='h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105'
               />
               <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
             </div>
@@ -108,13 +108,13 @@ export default function AboutSection({
                 : 'opacity-0 -translate-x-12 scale-95'
             }`}
           >
-            <div className='relative group overflow-hidden rounded-[25px] border border-gray-100 shadow-xl bg-gray-100 aspect-[4/3]'>
+            <div className='relative group overflow-hidden rounded-[25px] border border-gray-100 shadow-xl bg-gray-100 w-full aspect-[4/3]'>
               <NextImage
                 src={visionImage}
                 alt={visionTitle}
                 width={600}
                 height={450}
-                className='h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
+                className='h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105'
               />
               <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
             </div>
