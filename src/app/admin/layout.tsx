@@ -69,9 +69,9 @@ export default function AdminLayout({
   }
 
   return (
-    <div className='min-h-screen bg-slate-100 lg:flex'>
+    <div className='min-h-screen bg-slate-50 font-primary text-slate-800 lg:flex'>
       <AdminSidebar userName={user?.name} onLogout={handleLogout} />
-      <main className='flex-1 px-4 py-6 sm:px-6 lg:px-8'>{children}</main>
+      <main className='flex-1 px-4 py-8 sm:px-6 lg:px-10 max-w-7xl mx-auto w-full'>{children}</main>
     </div>
   );
 }

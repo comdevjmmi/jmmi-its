@@ -5,8 +5,8 @@ import * as React from 'react';
 import Link from 'next/link';
 
 import Loading from '@/components/Loading';
-import LinksLayoutWrapper from '@/components/links/LinksLayoutWrapper';
-import ProfileHeader from '@/components/links/ProfileHeader';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import Typography from '@/components/Typography';
 
 import { IoChevronBack } from 'react-icons/io5';
@@ -92,6 +92,8 @@ function buildPath(points: { x: number; y: number }[]) {
 }
 
 function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
+  const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
+
   const width = 720;
   const height = 300;
   const paddingX = 44;
@@ -106,7 +108,7 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
       const value = selector(item);
       const x = paddingX + stepX * index;
       const y = height - paddingY - (value / maxValue) * innerHeight;
-      return { x, y };
+      return { x, y, value };
     });
   };
 
@@ -121,33 +123,66 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
     return height - paddingY - innerHeight * ratio;
   });
 
+  const activeItem = hoveredIndex !== null ? data[hoveredIndex] : null;
+
   return (
-    <div className='rounded-xl border border-white/10 bg-white/5 p-5 shadow-sm sm:p-6 w-full'>
+    <div className='rounded-[25px] border border-gray-100 bg-gray-50/50 p-6 shadow-md w-full space-y-4'>
       <div className='flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between'>
         <div>
-          <p className='text-sm font-semibold uppercase tracking-[0.2em] text-emerald-400'>
+          <p className='font-sora text-xs font-semibold uppercase tracking-wider text-[#146637]'>
             Grafik Keuangan Bulanan (12 Bulan)
           </p>
-          <h2 className='mt-1 text-2xl font-semibold text-white'>Tren Pemasukan dan Pengeluaran</h2>
+          <h2 className='font-sora mt-1 text-xl sm:text-2xl font-bold text-slate-900'>
+            Tren Pemasukan dan Pengeluaran
+          </h2>
         </div>
-        <div className='flex flex-wrap gap-3 text-sm'>
-          <div className='inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-emerald-300'>
-            <span className='h-2.5 w-2.5 rounded-full bg-emerald-400' />
+        <div className='flex flex-wrap gap-3 text-xs sm:text-sm font-sora font-semibold'>
+          <div className='inline-flex items-center gap-2 rounded-full bg-[#146637]/10 px-3.5 py-1.5 text-[#146637]'>
+            <span className='h-2.5 w-2.5 rounded-full bg-[#146637]' />
             Pemasukan
           </div>
-          <div className='inline-flex items-center gap-2 rounded-full bg-rose-500/20 px-3 py-1.5 text-rose-300'>
-            <span className='h-2.5 w-2.5 rounded-full bg-rose-400' />
+          <div className='inline-flex items-center gap-2 rounded-full bg-rose-500/10 px-3.5 py-1.5 text-rose-600'>
+            <span className='h-2.5 w-2.5 rounded-full bg-rose-500' />
             Pengeluaran
           </div>
         </div>
       </div>
 
-      <div className='mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/20'>
+      <div className='relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-inner'>
+        {/* Floating Tooltip Box when hovering over data points */}
+        {activeItem && hoveredIndex !== null && incomePoints[hoveredIndex] && (
+          <div
+            className='pointer-events-none absolute z-20 rounded-2xl border border-gray-100 bg-white/95 p-3.5 shadow-xl backdrop-blur-md transition-all duration-150 transform -translate-x-1/2 -translate-y-full mb-3'
+            style={{
+              left: `${(incomePoints[hoveredIndex].x / width) * 100}%`,
+              top: `${(Math.min(incomePoints[hoveredIndex].y, expensePoints[hoveredIndex]?.y ?? 0) / height) * 100}%`,
+            }}
+          >
+            <p className='font-sora text-xs font-bold text-slate-800 border-b border-gray-100 pb-1.5 mb-1.5'>
+              {activeItem.label}
+            </p>
+            <div className='space-y-1 font-hanken text-xs font-semibold'>
+              <p className='text-[#146637] flex items-center justify-between gap-4'>
+                <span>Pemasukan:</span>
+                <span>{currencyFormatter.format(activeItem.income)}</span>
+              </p>
+              <p className='text-rose-600 flex items-center justify-between gap-4'>
+                <span>Pengeluaran:</span>
+                <span>{currencyFormatter.format(activeItem.expenses)}</span>
+              </p>
+              <p className='text-slate-900 flex items-center justify-between gap-4 border-t border-gray-100 pt-1'>
+                <span>Selisih:</span>
+                <span>{currencyFormatter.format(activeItem.balance)}</span>
+              </p>
+            </div>
+          </div>
+        )}
+
         <svg viewBox={`0 0 ${width} ${height}`} className='h-auto w-full'>
           <defs>
-            <linearGradient id='incomeFillDark' x1='0' x2='0' y1='0' y2='1'>
-              <stop offset='0%' stopColor='rgba(52, 211, 153, 0.25)' />
-              <stop offset='100%' stopColor='rgba(52, 211, 153, 0.02)' />
+            <linearGradient id='incomeFillLight' x1='0' x2='0' y1='0' y2='1'>
+              <stop offset='0%' stopColor='rgba(20, 102, 55, 0.2)' />
+              <stop offset='100%' stopColor='rgba(20, 102, 55, 0.01)' />
             </linearGradient>
           </defs>
 
@@ -158,36 +193,115 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
               x2={width - paddingX}
               y1={lineY}
               y2={lineY}
-              stroke='rgba(255, 255, 255, 0.15)'
+              stroke='rgba(226, 232, 240, 0.8)'
               strokeDasharray='6 6'
             />
           ))}
 
-          <path d={incomeAreaPath} fill='url(#incomeFillDark)' />
-          <path d={incomePath} fill='none' stroke='rgb(52 211 153)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
-          <path d={expensePath} fill='none' stroke='rgb(251 113 133)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
+          <path d={incomeAreaPath} fill='url(#incomeFillLight)' />
+          <path d={incomePath} fill='none' stroke='#146637' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
+          <path d={expensePath} fill='none' stroke='#E11D48' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
 
-          {incomePoints.map((point, index) => (
-            <g key={`income-${data[index]?.key ?? index}`}>
-              <circle cx={point.x} cy={point.y} r='4.5' fill='#1e293b' stroke='rgb(52 211 153)' strokeWidth='2.5' />
-              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgba(255, 255, 255, 0.7)' fontSize='11'>
-                {data[index]?.monthLabel}
-              </text>
-            </g>
-          ))}
+          {/* Render Vertical Guideline on Hover */}
+          {hoveredIndex !== null && incomePoints[hoveredIndex] && (
+            <line
+              x1={incomePoints[hoveredIndex].x}
+              x2={incomePoints[hoveredIndex].x}
+              y1={paddingY}
+              y2={height - paddingY}
+              stroke='#146637'
+              strokeWidth='1.5'
+              strokeDasharray='4 4'
+              className='transition-all duration-150'
+            />
+          )}
+
+          {/* Interactive Data Points */}
+          {incomePoints.map((point, index) => {
+            const expPoint = expensePoints[index];
+            const isHovered = hoveredIndex === index;
+
+            return (
+              <g key={`point-group-${data[index]?.key ?? index}`}>
+                {/* Expense Point Dot */}
+                {expPoint && (
+                  <circle
+                    cx={expPoint.x}
+                    cy={expPoint.y}
+                    r={isHovered ? '7' : '4.5'}
+                    fill='#ffffff'
+                    stroke='#E11D48'
+                    strokeWidth={isHovered ? '3.5' : '2.5'}
+                    className='transition-all duration-200'
+                  />
+                )}
+
+                {/* Income Point Dot */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={isHovered ? '7' : '4.5'}
+                  fill='#ffffff'
+                  stroke='#146637'
+                  strokeWidth={isHovered ? '3.5' : '2.5'}
+                  className='transition-all duration-200'
+                />
+
+                {/* Month X-Axis Label */}
+                <text
+                  x={point.x}
+                  y={height - 10}
+                  textAnchor='middle'
+                  fill={isHovered ? '#146637' : '#64748b'}
+                  fontWeight={isHovered ? '700' : '500'}
+                  fontSize='11'
+                  fontFamily='var(--font-hanken)'
+                  className='transition-colors duration-150'
+                >
+                  {data[index]?.monthLabel}
+                </text>
+
+                {/* Invisible Broad Hover Target Hitbox */}
+                <rect
+                  x={point.x - stepX / 2}
+                  y={0}
+                  width={stepX}
+                  height={height}
+                  fill='transparent'
+                  className='cursor-pointer'
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                />
+              </g>
+            );
+          })}
         </svg>
       </div>
 
-      <div className='mt-4 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
-        {data.slice(-6).map((item) => (
-          <div key={item.key} className='rounded-xl border border-white/10 bg-white/5 px-3 py-2.5'>
-            <p className='text-xs font-semibold text-white/90 truncate'>{item.label}</p>
-            <div className='mt-1 space-y-0.5 text-xs'>
-              <p className='text-emerald-400'>+{currencyFormatter.format(item.income)}</p>
-              <p className='text-rose-400'>-{currencyFormatter.format(item.expenses)}</p>
+      <div className='mt-5 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
+        {data.slice(-6).map((item, idx) => {
+          const originalIndex = data.length - 6 + idx;
+          const isSelected = hoveredIndex === originalIndex;
+
+          return (
+            <div
+              key={item.key}
+              onMouseEnter={() => setHoveredIndex(originalIndex)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              className={`rounded-2xl border p-3.5 shadow-sm cursor-pointer transition-all duration-200 ${
+                isSelected
+                  ? 'border-[#146637] bg-[#146637]/5 shadow-md scale-105'
+                  : 'border-gray-100 bg-white hover:border-gray-300'
+              }`}
+            >
+              <p className='font-sora text-xs font-bold text-slate-800 truncate'>{item.label}</p>
+              <div className='mt-1.5 space-y-0.5 font-hanken text-xs font-medium'>
+                <p className='text-[#146637]'>+{currencyFormatter.format(item.income)}</p>
+                <p className='text-rose-600'>-{currencyFormatter.format(item.expenses)}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -207,22 +321,22 @@ function FundSectionCard({
   headerBg: string;
 }) {
   return (
-    <div className='rounded-2xl border border-white/15 bg-white/5 overflow-hidden shadow-lg'>
-      <div className={`px-4 py-3 font-semibold text-white text-base ${headerBg}`}>
+    <div className='rounded-[25px] border border-gray-100 bg-white overflow-hidden shadow-md hover:shadow-xl transition-all duration-300'>
+      <div className={`px-6 py-4 font-sora font-bold text-white text-base ${headerBg}`}>
         {sectionTitle}
       </div>
-      <div className='p-4 space-y-3'>
-        <div className='flex justify-between items-center text-sm'>
-          <span className='text-white/70'>Pemasukan:</span>
-          <span className='font-semibold text-emerald-400'>{currencyFormatter.format(income)}</span>
+      <div className='p-6 space-y-3.5 font-hanken'>
+        <div className='flex justify-between items-center text-sm sm:text-base'>
+          <span className='text-slate-500'>Pemasukan:</span>
+          <span className='font-bold text-[#146637]'>{currencyFormatter.format(income)}</span>
         </div>
-        <div className='flex justify-between items-center text-sm'>
-          <span className='text-white/70'>Pengeluaran:</span>
-          <span className='font-semibold text-rose-400'>{currencyFormatter.format(expense)}</span>
+        <div className='flex justify-between items-center text-sm sm:text-base'>
+          <span className='text-slate-500'>Pengeluaran:</span>
+          <span className='font-bold text-rose-600'>{currencyFormatter.format(expense)}</span>
         </div>
-        <div className='border-t border-white/10 pt-2 flex justify-between items-center text-base font-bold'>
-          <span className='text-white/90'>Saldo:</span>
-          <span className='text-white'>{currencyFormatter.format(balance)}</span>
+        <div className='border-t border-gray-100 pt-3 flex justify-between items-center text-base sm:text-lg font-extrabold'>
+          <span className='text-slate-900'>Saldo:</span>
+          <span className='text-slate-900'>{currencyFormatter.format(balance)}</span>
         </div>
       </div>
     </div>
@@ -233,40 +347,40 @@ function TransactionRow({ transaction }: { transaction: FinanceTransaction }) {
   const isIncome = transaction.type === 'income';
 
   return (
-    <div className='bg-white/10 rounded-lg p-4 border border-white/15'>
+    <div className='bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all'>
       <div className='flex items-start justify-between gap-3'>
         <div>
-          <div className='flex items-center gap-2 flex-wrap'>
-            <Typography as='p' variant='body' className='text-white font-medium'>
+          <div className='flex items-center gap-2.5 flex-wrap'>
+            <p className='font-hanken text-base font-semibold text-slate-900'>
               {transaction.description}
-            </Typography>
-            <span className='text-[10px] px-2 py-0.5 rounded bg-white/20 text-white/90 font-medium'>
+            </p>
+            <span className='text-[11px] px-2.5 py-0.5 rounded-full bg-gray-100 text-slate-600 font-sora font-semibold'>
               {getFundBadgeLabel(transaction.fund_type)}
             </span>
           </div>
-          <Typography as='p' variant='label' className='text-white/75 mt-1'>
+          <p className='font-hanken text-xs text-slate-500 mt-1'>
             {dateFormatter.format(new Date(transaction.transaction_date))}
-          </Typography>
+          </p>
         </div>
 
         <span
-          className={`text-xs px-2.5 py-1 rounded-full font-semibold shrink-0 ${
+          className={`text-xs px-3 py-1 rounded-full font-sora font-semibold shrink-0 ${
             isIncome
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-rose-100 text-rose-700'
+              ? 'bg-[#146637]/10 text-[#146637]'
+              : 'bg-rose-50 text-rose-700'
           }`}
         >
           {isIncome ? 'Pemasukan' : 'Pengeluaran'}
         </span>
       </div>
 
-      <Typography
-        as='p'
-        variant='body'
-        className={`mt-3 font-semibold ${isIncome ? 'text-emerald-300' : 'text-rose-300'}`}
+      <p
+        className={`mt-3 font-sora font-extrabold text-base ${
+          isIncome ? 'text-[#146637]' : 'text-rose-600'
+        }`}
       >
         {isIncome ? '+' : '-'} {currencyFormatter.format(transaction.amount)}
-      </Typography>
+      </p>
     </div>
   );
 }
@@ -299,55 +413,59 @@ export default function FinancePage() {
   const hasUnassigned = unassignedSummary.total_income > 0 || unassignedSummary.total_expense > 0;
 
   return (
-    <LinksLayoutWrapper>
-      <div className='relative z-10 flex flex-col items-center px-4 py-8 sm:py-12'>
-        <ProfileHeader />
+    <div className='flex min-h-screen flex-col bg-white font-primary text-slate-800'>
+      <Navbar />
 
-        <div className='w-full max-w-xl md:max-w-4xl lg:max-w-6xl space-y-6'>
-          <div className='text-center'>
-            <Typography as='h1' variant='h5' className='text-white'>
+      <main className='relative z-10 flex-1 py-12 px-4 sm:px-8 lg:px-16'>
+        <div className='mx-auto max-w-[1312px] space-y-10'>
+          {/* Header */}
+          <div className='space-y-3 max-w-2xl'>
+            <h1 className='font-sora text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#146637] tracking-tight'>
               Transparansi Keuangan
-            </Typography>
-            <Typography as='p' variant='body' className='text-white/80 mt-2'>
-              Laporan pemasukan, pengeluaran, dan saldo Dana Kas & Dana Takmir.
-            </Typography>
+            </h1>
+            <p className='font-hanken text-lg sm:text-xl text-slate-600 leading-relaxed'>
+              Laporan akuntabilitas publik, pemasukan, pengeluaran, serta saldo Dana Kas & Dana Takmir JMMI ITS.
+            </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          {/* Summary Cards */}
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <FundSectionCard
               sectionTitle='Dana Kas'
               income={kasSummary.total_income}
               expense={kasSummary.total_expense}
               balance={kasSummary.balance}
-              headerBg='bg-gradient-to-r from-emerald-600 to-teal-600'
+              headerBg='bg-[#146637]'
             />
             <FundSectionCard
               sectionTitle='Dana Takmir'
               income={takmirSummary.total_income}
               expense={takmirSummary.total_expense}
               balance={takmirSummary.balance}
-              headerBg='bg-gradient-to-r from-cyan-600 to-blue-600'
+              headerBg='bg-[#0e4a28]'
             />
             <FundSectionCard
               sectionTitle='Total Keseluruhan'
               income={data?.total_income ?? 0}
               expense={data?.total_expense ?? 0}
               balance={data?.current_balance ?? 0}
-              headerBg='bg-gradient-to-r from-purple-600 to-indigo-600'
+              headerBg='bg-slate-900'
             />
           </div>
 
+          {/* Chart */}
           <div className='w-full'>
             <FinanceLineChart data={monthlySeries} />
           </div>
 
-          <div className='space-y-3'>
-            <Typography as='h2' variant='h6' className='text-white'>
+          {/* Transaction History */}
+          <div className='space-y-6 pt-4'>
+            <h2 className='font-sora text-2xl sm:text-3xl font-bold text-slate-900'>
               Riwayat Transaksi
-            </Typography>
+            </h2>
 
             {transactions.length ? (
-              <div className='space-y-3'>
+              <div className='space-y-3.5'>
                 {transactions.map((transaction) => (
                   <TransactionRow
                     key={transaction.transaction_id}
@@ -356,22 +474,22 @@ export default function FinancePage() {
                 ))}
 
                 {totalPages > 1 && (
-                  <div className='flex items-center justify-between border-t border-white/10 pt-4 mt-2'>
-                    <span className='text-sm text-white/70'>
+                  <div className='flex items-center justify-between border-t border-gray-200 pt-6 mt-4'>
+                    <span className='font-hanken text-sm text-slate-500'>
                       Halaman {currentPage} dari {totalPages}
                     </span>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-3'>
                       <button
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className='px-3 py-1 text-sm rounded border border-white/20 text-white/90 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition'
+                        className='px-4 py-2 text-sm font-sora font-semibold rounded-full border border-gray-200 text-slate-700 hover:border-[#146637] hover:text-[#146637] disabled:opacity-50 disabled:cursor-not-allowed transition-all'
                       >
                         Sebelumnya
                       </button>
                       <button
                         onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className='px-3 py-1 text-sm rounded border border-white/20 text-white/90 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition'
+                        className='px-4 py-2 text-sm font-sora font-semibold rounded-full border border-gray-200 text-slate-700 hover:border-[#146637] hover:text-[#146637] disabled:opacity-50 disabled:cursor-not-allowed transition-all'
                       >
                         Selanjutnya
                       </button>
@@ -380,29 +498,28 @@ export default function FinancePage() {
                 )}
               </div>
             ) : (
-              <div className='bg-white/10 rounded-lg p-4 border border-white/15'>
-                <Typography as='p' variant='body' className='text-white/80'>
+              <div className='bg-gray-50 rounded-2xl p-6 border border-gray-200 text-center'>
+                <p className='font-hanken text-slate-600'>
                   Belum ada data transaksi keuangan.
-                </Typography>
+                </p>
               </div>
             )}
           </div>
 
-          <div className='pt-4'>
+          <div className='pt-6'>
             <Link
               href='/'
-              className='flex items-center justify-center gap-2 text-white hover:text-gray-300 transition-colors'
+              className='inline-flex items-center gap-2 font-sora text-sm font-semibold text-[#146637] hover:underline'
             >
-              <IoChevronBack className='w-5 h-5' />
-              <Typography as='span' variant='body' weight='medium'>
-                Kembali ke Beranda
-              </Typography>
+              <IoChevronBack className='w-4 h-4' />
+              <span>Kembali ke Beranda</span>
             </Link>
           </div>
         </div>
+      </main>
 
-        <div className='h-12'></div>
-      </div>
-    </LinksLayoutWrapper>
+      <Footer />
+    </div>
   );
 }
+

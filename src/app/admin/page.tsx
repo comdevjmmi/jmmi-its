@@ -139,32 +139,32 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
   });
 
   return (
-    <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+    <div className='rounded-[25px] border border-gray-100 bg-white p-6 shadow-md'>
       <div className='flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between'>
         <div>
-          <p className='text-sm font-semibold uppercase tracking-[0.2em] text-brand-green-700'>
-            Grafik Keuangan Bulanan (12 Bulan)
+          <p className='font-sora text-xs font-semibold uppercase tracking-wider text-[#146637]'>
+            Grafik Keuangan Bulanan
           </p>
-          <h2 className='mt-1 text-2xl font-semibold text-slate-900'>Tren Pemasukan dan Pengeluaran</h2>
+          <h2 className='font-sora mt-1 text-xl sm:text-2xl font-bold text-slate-900'>Tren Pemasukan & Pengeluaran</h2>
         </div>
-        <div className='flex flex-wrap gap-3 text-sm'>
-          <div className='inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-emerald-700'>
-            <span className='h-2.5 w-2.5 rounded-full bg-emerald-500' />
+        <div className='flex flex-wrap gap-3 font-sora text-xs font-semibold'>
+          <div className='inline-flex items-center gap-2 rounded-full bg-[#146637]/10 px-3.5 py-1.5 text-[#146637]'>
+            <span className='h-2.5 w-2.5 rounded-full bg-[#146637]' />
             Pemasukan
           </div>
-          <div className='inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-rose-700'>
+          <div className='inline-flex items-center gap-2 rounded-full bg-rose-50 px-3.5 py-1.5 text-rose-600'>
             <span className='h-2.5 w-2.5 rounded-full bg-rose-500' />
             Pengeluaran
           </div>
         </div>
       </div>
 
-      <div className='mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/80'>
+      <div className='mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/50 p-2'>
         <svg viewBox={`0 0 ${width} ${height}`} className='h-auto w-full'>
           <defs>
-            <linearGradient id='incomeFill' x1='0' x2='0' y1='0' y2='1'>
-              <stop offset='0%' stopColor='rgb(16 185 129 / 0.26)' />
-              <stop offset='100%' stopColor='rgb(16 185 129 / 0.02)' />
+            <linearGradient id='incomeFillAdmin' x1='0' x2='0' y1='0' y2='1'>
+              <stop offset='0%' stopColor='rgba(20, 102, 55, 0.2)' />
+              <stop offset='100%' stopColor='rgba(20, 102, 55, 0.01)' />
             </linearGradient>
           </defs>
 
@@ -175,19 +175,19 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
               x2={width - paddingX}
               y1={lineY}
               y2={lineY}
-              stroke='rgb(148 163 184 / 0.35)'
+              stroke='rgba(226, 232, 240, 0.8)'
               strokeDasharray='6 6'
             />
           ))}
 
-          <path d={incomeAreaPath} fill='url(#incomeFill)' />
-          <path d={incomePath} fill='none' stroke='rgb(5 150 105)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
-          <path d={expensePath} fill='none' stroke='rgb(244 63 94)' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
+          <path d={incomeAreaPath} fill='url(#incomeFillAdmin)' />
+          <path d={incomePath} fill='none' stroke='#146637' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' />
+          <path d={expensePath} fill='none' stroke='#E11D48' strokeWidth='3.5' strokeLinecap='round' strokeLinejoin='round' strokeDasharray='10 6' />
 
           {incomePoints.map((point, index) => (
             <g key={`income-${data[index]?.key ?? index}`}>
-              <circle cx={point.x} cy={point.y} r='4.5' fill='white' stroke='rgb(5 150 105)' strokeWidth='2.5' />
-              <text x={point.x} y={height - 10} textAnchor='middle' fill='rgb(71 85 105)' fontSize='11'>
+              <circle cx={point.x} cy={point.y} r='4.5' fill='white' stroke='#146637' strokeWidth='2.5' />
+              <text x={point.x} y={height - 10} textAnchor='middle' fill='#64748b' fontSize='11' fontFamily='var(--font-hanken)'>
                 {data[index]?.monthLabel}
               </text>
             </g>
@@ -195,13 +195,13 @@ function FinanceLineChart({ data }: { data: MonthlyPoint[] }) {
         </svg>
       </div>
 
-      <div className='mt-4 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
+      <div className='mt-5 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
         {data.slice(-6).map((item) => (
-          <div key={item.key} className='rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs'>
-            <p className='font-semibold text-slate-700 truncate'>{item.label}</p>
-            <div className='mt-1 space-y-0.5 text-xs'>
-              <p className='text-emerald-700'>+Rp {formatCurrency(item.income)}</p>
-              <p className='text-rose-700'>-Rp {formatCurrency(item.expenses)}</p>
+          <div key={item.key} className='rounded-2xl border border-gray-100 bg-gray-50/50 p-3 shadow-sm'>
+            <p className='font-sora text-xs font-bold text-slate-800 truncate'>{item.label}</p>
+            <div className='mt-1 space-y-0.5 font-hanken text-xs font-semibold'>
+              <p className='text-[#146637]'>+Rp {formatCurrency(item.income)}</p>
+              <p className='text-rose-600'>-Rp {formatCurrency(item.expenses)}</p>
             </div>
           </div>
         ))}
@@ -224,22 +224,22 @@ function MetricCard({
   tone: 'emerald' | 'rose' | 'amber' | 'slate';
 }) {
   const toneClasses = {
-    emerald: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
-    rose: 'bg-rose-50 text-rose-700 ring-rose-100',
-    amber: 'bg-amber-50 text-amber-700 ring-amber-100',
-    slate: 'bg-slate-50 text-slate-700 ring-slate-200',
+    emerald: 'bg-[#146637]/10 text-[#146637]',
+    rose: 'bg-rose-50 text-rose-600',
+    amber: 'bg-amber-50 text-amber-600',
+    slate: 'bg-slate-100 text-slate-700',
   };
 
   return (
-    <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm'>
+    <div className='rounded-[25px] border border-gray-100 bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300'>
       <div className='flex items-start justify-between gap-4'>
-        <div>
-          <p className='text-sm font-medium text-slate-500'>{title}</p>
-          <p className='mt-2 text-2xl font-semibold text-slate-900'>{value}</p>
-          <p className='mt-2 text-sm text-slate-500'>{description}</p>
+        <div className='space-y-1'>
+          <p className='font-sora text-xs font-semibold text-slate-500 uppercase tracking-wider'>{title}</p>
+          <p className='font-sora text-2xl font-extrabold text-slate-900'>{value}</p>
+          <p className='font-hanken text-xs text-slate-500 pt-1'>{description}</p>
         </div>
-        <div className={`rounded-2xl p-3 ring-1 ${toneClasses[tone]}`}>
-          <Icon className='h-5 w-5' />
+        <div className={`rounded-2xl p-3.5 shrink-0 ${toneClasses[tone]}`}>
+          <Icon className='h-6 w-6' />
         </div>
       </div>
     </div>
@@ -251,17 +251,17 @@ function UpcomingEventCard({ events }: { events: ReminderEvent[] }) {
 
   if (!nextEvent) {
     return (
-      <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+      <div className='rounded-[25px] border border-gray-100 bg-white p-6 shadow-md'>
         <div className='flex items-start justify-between gap-4'>
           <div>
-            <p className='text-sm font-semibold uppercase tracking-[0.2em] text-brand-green-700'>Pengingat event</p>
-            <h2 className='mt-1 text-2xl font-semibold text-slate-900'>Agenda terdekat dalam 7 hari</h2>
+            <p className='font-sora text-xs font-semibold uppercase tracking-wider text-[#146637]'>Pengingat Event</p>
+            <h2 className='font-sora mt-1 text-xl sm:text-2xl font-bold text-slate-900'>Agenda 7 Hari Ke Depan</h2>
           </div>
-          <div className='rounded-2xl bg-brand-yellow/20 p-3 text-brand-green-700 ring-1 ring-brand-yellow/40'>
+          <div className='rounded-2xl bg-[#146637]/10 p-3 text-[#146637]'>
             <CalendarClock className='h-5 w-5' />
           </div>
         </div>
-        <div className='mt-6 rounded-3xl border border-dashed border-slate-300 p-8 text-center text-slate-500'>
+        <div className='mt-6 rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-8 text-center font-hanken text-slate-500'>
           Belum ada agenda dalam 7 hari ke depan.
         </div>
       </div>
@@ -269,51 +269,51 @@ function UpcomingEventCard({ events }: { events: ReminderEvent[] }) {
   }
 
   return (
-    <div className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+    <div className='rounded-[25px] border border-gray-100 bg-white p-6 shadow-md space-y-6'>
       <div className='flex items-start justify-between gap-4'>
         <div>
-          <p className='text-sm font-semibold uppercase tracking-[0.2em] text-brand-green-700'>Pengingat event</p>
-          <h2 className='mt-1 text-2xl font-semibold text-slate-900'>Agenda terdekat dalam 7 hari</h2>
+          <p className='font-sora text-xs font-semibold uppercase tracking-wider text-[#146637]'>Pengingat Event</p>
+          <h2 className='font-sora mt-1 text-xl sm:text-2xl font-bold text-slate-900'>Agenda 7 Hari Ke Depan</h2>
         </div>
-        <div className='rounded-2xl bg-brand-yellow/20 p-3 text-brand-green-700 ring-1 ring-brand-yellow/40'>
+        <div className='rounded-2xl bg-[#146637]/10 p-3 text-[#146637]'>
           <CalendarClock className='h-5 w-5' />
         </div>
       </div>
 
-      <div className='mt-6 rounded-3xl bg-gradient-to-br from-brand-green-700 to-brand-green-500 p-5 text-white shadow-lg'>
-        <p className='text-sm uppercase tracking-[0.18em] text-white/75'>Event berikutnya</p>
-        <h3 className='mt-3 text-xl font-semibold'>{nextEvent.title}</h3>
-        <div className='mt-4 grid gap-3 text-sm text-white/90 sm:grid-cols-2'>
+      <div className='rounded-2xl bg-[#146637] p-6 text-white shadow-lg space-y-3'>
+        <p className='font-sora text-xs font-bold uppercase tracking-wider text-white/70'>Event Terdekat</p>
+        <h3 className='font-sora text-xl font-bold'>{nextEvent.title}</h3>
+        <div className='grid gap-3 font-hanken text-xs text-white/90 sm:grid-cols-2 pt-2 border-t border-white/15'>
           <div>
             <p className='text-white/60'>Tanggal</p>
-            <p className='mt-1 font-medium'>{nextEvent.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <p className='font-semibold'>{nextEvent.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <div>
             <p className='text-white/60'>Waktu</p>
-            <p className='mt-1 font-medium'>{nextEvent.time}</p>
+            <p className='font-semibold'>{nextEvent.time} WIB</p>
           </div>
           <div>
             <p className='text-white/60'>Lokasi</p>
-            <p className='mt-1 font-medium'>{nextEvent.location}</p>
+            <p className='font-semibold'>{nextEvent.location}</p>
           </div>
           <div>
             <p className='text-white/60'>Catatan</p>
-            <p className='mt-1 font-medium'>{nextEvent.note}</p>
+            <p className='font-semibold'>{nextEvent.note || '-'}</p>
           </div>
         </div>
       </div>
 
-      <div className='mt-5 space-y-3'>
+      <div className='space-y-3'>
         {events.slice(1).map((event, i) => (
-          <div key={event.id || `${event.title}-${i}`} className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3'>
+          <div key={event.id || `${event.title}-${i}`} className='rounded-2xl border border-gray-100 bg-gray-50/50 p-4'>
             <div className='flex items-center justify-between gap-3'>
               <div>
-                <p className='font-medium text-slate-900'>{event.title}</p>
-                <p className='mt-1 text-sm text-slate-500'>
-                  {event.date.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })} • {event.time}
+                <p className='font-sora text-sm font-bold text-slate-900'>{event.title}</p>
+                <p className='font-hanken mt-1 text-xs text-slate-500'>
+                  {event.date.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })} • {event.time} WIB
                 </p>
               </div>
-              <span className='rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-green-700 ring-1 ring-brand-green-700/20'>
+              <span className='rounded-full bg-[#146637]/10 px-3 py-1 font-sora text-[10px] font-bold text-[#146637]'>
                 Minggu ini
               </span>
             </div>
@@ -364,54 +364,55 @@ export default function AdminDashboard() {
 
   return (
     <div className='space-y-8'>
-      <section className='overflow-hidden rounded-3xl bg-gradient-to-r from-brand-green-700 via-brand-green-700 to-brand-yellow p-6 text-white shadow-lg sm:p-8'>
-        <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
-          <div className='max-w-3xl'>
-            <div className='inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/85 ring-1 ring-white/15'>
-              <CircleDollarSign className='h-4 w-4' />
-              Admin dashboard
-            </div>
-            <h1 className='mt-4 text-3xl font-semibold tracking-tight sm:text-4xl'>
-              Selamat datang{user?.name ? `, ${user.name}` : ''}
-            </h1>
-            <p className='mt-3 max-w-2xl text-sm leading-7 text-white/80 sm:text-base'>
-              Pantau tren keuangan, cek agenda terdekat, dan akses menu admin yang sedang disiapkan.
-            </p>
+      {/* Welcome Banner */}
+      <section className='overflow-hidden rounded-[25px] bg-[#146637] p-8 text-white shadow-xl relative'>
+        <div className='max-w-3xl space-y-4 relative z-10'>
+          <div className='inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-sora text-xs font-semibold uppercase tracking-wider text-white'>
+            <CircleDollarSign className='h-4 w-4' />
+            Admin Panel Dashboard
           </div>
+          <h1 className='font-sora text-3xl sm:text-4xl font-extrabold tracking-tight'>
+            Selamat datang{user?.name ? `, ${user.name}` : ''}!
+          </h1>
+          <p className='font-hanken text-base text-white/85 leading-relaxed'>
+            Pantau ringkasan tren keuangan, jadwal agenda mendatang, serta pengelolaan sistem JMMI ITS.
+          </p>
         </div>
       </section>
 
-      <section className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+      {/* Summary Metrics */}
+      <section className='grid gap-6 md:grid-cols-2 xl:grid-cols-4'>
         <MetricCard
-          title='Total pemasukan'
+          title='Total Pemasukan'
           value={`Rp ${formatCurrency(totalIncome)}`}
-          description='Akumulasi seluruh pemasukan yang tercatat.'
+          description='Akumulasi pemasukan terverifikasi.'
           icon={TrendingUp}
           tone='emerald'
         />
         <MetricCard
-          title='Total pengeluaran'
+          title='Total Pengeluaran'
           value={`Rp ${formatCurrency(totalExpense)}`}
-          description='Akumulasi seluruh pengeluaran yang tercatat.'
+          description='Akumulasi pengeluaran terverifikasi.'
           icon={TrendingDown}
           tone='rose'
         />
         <MetricCard
-          title='Saldo berjalan'
+          title='Saldo Berjalan'
           value={`Rp ${formatCurrency(balance)}`}
-          description='Selisih pemasukan dan pengeluaran saat ini.'
+          description='Net kas bersih berjalan.'
           icon={CircleDollarSign}
           tone='amber'
         />
         <MetricCard
-          title='Jumlah transaksi'
+          title='Jumlah Transaksi'
           value={String(transactions.length)}
-          description='Total transaksi yang sudah tersimpan di sistem.'
+          description='Total pencatatan transaksi.'
           icon={BarChart3}
           tone='slate'
         />
       </section>
 
+      {/* Grid: Events & Chart */}
       <div className='grid gap-6 xl:grid-cols-[1fr_1.55fr]'>
         <UpcomingEventCard events={reminderEvents} />
         <FinanceLineChart data={monthlySeries} />

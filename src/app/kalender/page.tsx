@@ -5,8 +5,8 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock3, LayoutGrid, List, MapP
 
 import BackButton from '@/components/BackButton';
 import Loading from '@/components/Loading';
-import LinksLayoutWrapper from '@/components/links/LinksLayoutWrapper';
-import ProfileHeader from '@/components/links/ProfileHeader';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import Typography from '@/components/Typography';
 
 import { useGetCalendarEvents } from '@/app/kalender/hook/useCalendar';
@@ -280,46 +280,43 @@ export default function CalendarPage() {
   }
 
   return (
-    <LinksLayoutWrapper>
-      <div className='relative z-10 flex flex-col items-center px-4 py-8 sm:py-12'>
-        <ProfileHeader />
+    <div className='flex min-h-screen flex-col bg-white font-primary text-slate-800'>
+      <Navbar />
 
-        <div className='w-full max-w-6xl space-y-6'>
-          <div className='rounded-2xl border border-white/20 bg-white/10 p-5 text-white backdrop-blur-sm sm:p-6'>
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
-              <div>
-                <div className='flex items-center gap-2 text-brand-yellow'>
-                  <CalendarDays className='h-5 w-5' />
-                  <Typography as='h1' variant='h6' className='text-white'>
-                    Kalender Kegiatan
-                  </Typography>
-                </div>
-                <Typography as='p' variant='body' className='mt-2 text-white/80'>
-                  Agenda kegiatan JMMI yang bisa dipantau oleh seluruh publik.
-                </Typography>
-              </div>
-
-              <button
-                type='button'
-                onClick={() => setViewMode((mode) => (mode === 'list' ? 'calendar' : 'list'))}
-                className='inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition-colors hover:bg-brand-yellow/90'
-              >
-                {viewMode === 'list' ? (
-                  <>
-                    <LayoutGrid className='h-4 w-4' />
-                    Lihat tampilan kalender
-                  </>
-                ) : (
-                  <>
-                    <List className='h-4 w-4' />
-                    Lihat tampilan daftar
-                  </>
-                )}
-              </button>
+      <main className='relative z-10 flex-1 py-12 px-4 sm:px-8 lg:px-16'>
+        <div className='mx-auto max-w-[1312px] space-y-10'>
+          {/* Header */}
+          <div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
+            <div className='space-y-3 max-w-2xl'>
+              <h1 className='font-sora text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#146637] tracking-tight'>
+                Kalender Kegiatan
+              </h1>
+              <p className='font-hanken text-lg sm:text-xl text-slate-600 leading-relaxed'>
+                Agenda & jadwal kegiatan JMMI ITS yang bisa dipantau secara langsung oleh seluruh publik.
+              </p>
             </div>
+
+            <button
+              type='button'
+              onClick={() => setViewMode((mode) => (mode === 'list' ? 'calendar' : 'list'))}
+              className='inline-flex items-center justify-center gap-2 rounded-full bg-[#146637] px-6 py-3 font-sora text-sm font-semibold text-white shadow-md transition-all hover:bg-[#0e4a28] hover:scale-105 active:scale-95 shrink-0'
+            >
+              {viewMode === 'list' ? (
+                <>
+                  <LayoutGrid className='h-4 w-4' />
+                  Lihat Tampilan Kalender
+                </>
+              ) : (
+                <>
+                  <List className='h-4 w-4' />
+                  Lihat Tampilan Daftar
+                </>
+              )}
+            </button>
           </div>
 
-          <div className='flex flex-wrap gap-2'>
+          {/* Filter Pills */}
+          <div className='flex flex-wrap gap-3'>
             {filterOptions.map((option) => {
               const isActive = activeFilter === option.key;
 
@@ -328,10 +325,10 @@ export default function CalendarPage() {
                   key={option.key}
                   type='button'
                   onClick={() => setActiveFilter(option.key)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-full px-5 py-2.5 font-sora text-xs font-semibold uppercase tracking-wider transition-all ${
                     isActive
-                      ? 'bg-brand-yellow text-brand-black shadow-sm'
-                      : 'bg-white/10 text-white/85 hover:bg-white/20'
+                      ? 'bg-[#146637] text-white shadow-md'
+                      : 'bg-gray-100 text-slate-600 hover:bg-gray-200'
                   }`}
                 >
                   {option.label}
@@ -342,45 +339,45 @@ export default function CalendarPage() {
 
           {viewMode === 'list' ? (
             filteredEvents.length === 0 ? (
-              <div className='rounded-2xl border border-white/20 bg-white/10 p-6 text-center text-white/80 backdrop-blur-sm'>
+              <div className='rounded-[25px] border border-gray-100 bg-gray-50/50 p-8 text-center text-slate-600 font-hanken'>
                 Belum ada event terjadwal.
               </div>
             ) : (
-              <div className='space-y-4'>
+              <div className='grid gap-4 sm:gap-6'>
                 {filteredEvents.map((event) => (
                   <article
                     key={event.event_id}
-                    className='rounded-2xl border border-white/20 bg-white/10 p-5 text-white shadow-md backdrop-blur-sm'
+                    className='rounded-[25px] border border-gray-100 bg-white p-6 text-slate-800 shadow-sm hover:shadow-xl transition-all duration-300'
                   >
                     <div className='flex items-start justify-between gap-3'>
-                      <Typography as='h2' variant='h6' className='text-white'>
+                      <h2 className='font-sora text-xl sm:text-2xl font-bold text-slate-900'>
                         {event.event_name}
-                      </Typography>
+                      </h2>
                       {event.is_recurring && (
-                        <span className='inline-flex items-center gap-1 rounded-full bg-emerald-300/20 px-2.5 py-1 text-xs font-semibold text-emerald-100 ring-1 ring-emerald-200/40'>
+                        <span className='inline-flex items-center gap-1 rounded-full bg-[#146637]/10 px-3 py-1 font-sora text-xs font-semibold text-[#146637]'>
                           <Repeat2 className='h-3.5 w-3.5' />
                           {formatRecurrenceLabel(event.recurrence_type, event.recurrence_interval)}
                         </span>
                       )}
                     </div>
 
-                    <div className='mt-4 grid gap-2 text-sm text-white/85'>
-                      <div className='inline-flex items-center gap-2'>
-                        <CalendarDays className='h-4 w-4 text-brand-yellow' />
-                        {formatDate(event.event_date)}
+                    <div className='mt-5 grid gap-3 sm:grid-cols-3 font-hanken text-sm text-slate-600'>
+                      <div className='inline-flex items-center gap-2.5'>
+                        <CalendarDays className='h-4 w-4 text-[#146637]' />
+                        <span>{formatDate(event.event_date)}</span>
                       </div>
-                      <div className='inline-flex items-center gap-2'>
-                        <Clock3 className='h-4 w-4 text-brand-yellow' />
-                        {formatTime(event.event_time)} WIB
+                      <div className='inline-flex items-center gap-2.5'>
+                        <Clock3 className='h-4 w-4 text-[#146637]' />
+                        <span>{formatTime(event.event_time)} WIB</span>
                       </div>
-                      <div className='inline-flex items-center gap-2'>
-                        <MapPin className='h-4 w-4 text-brand-yellow' />
-                        {event.location}
+                      <div className='inline-flex items-center gap-2.5'>
+                        <MapPin className='h-4 w-4 text-[#146637]' />
+                        <span>{event.location}</span>
                       </div>
                     </div>
 
                     {event.notes && (
-                      <p className='mt-4 rounded-xl bg-black/20 px-3 py-2 text-sm text-white/85'>
+                      <p className='mt-4 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-3 font-hanken text-sm text-slate-600 leading-relaxed'>
                         {event.notes}
                       </p>
                     )}
@@ -389,42 +386,42 @@ export default function CalendarPage() {
               </div>
             )
           ) : (
-            <div className='grid gap-4 lg:grid-cols-[minmax(0,2fr)_320px] lg:gap-5'>
-              <div className='rounded-2xl border border-white/20 bg-white/10 p-4 text-white shadow-md backdrop-blur-sm sm:p-5'>
-                <div className='flex items-center justify-between gap-3 border-b border-white/15 pb-4'>
+            <div className='grid gap-6 lg:grid-cols-[minmax(0,2fr)_340px]'>
+              <div className='rounded-[25px] border border-gray-100 bg-white p-6 shadow-md'>
+                <div className='flex items-center justify-between gap-3 border-b border-gray-100 pb-5'>
                   <button
                     type='button'
                     onClick={goToPreviousMonth}
-                    className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20'
+                    className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-[#146637] shadow-sm transition-all hover:border-[#146637] hover:bg-[#146637] hover:text-white active:scale-95'
                     aria-label='Bulan sebelumnya'
                   >
                     <ChevronLeft className='h-5 w-5' />
                   </button>
 
-                  <Typography as='h2' variant='h6' className='text-center text-white'>
+                  <h2 className='font-sora text-xl font-bold text-slate-900 text-center capitalize'>
                     {monthLabel}
-                  </Typography>
+                  </h2>
 
                   <button
                     type='button'
                     onClick={goToNextMonth}
-                    className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20'
+                    className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-[#146637] shadow-sm transition-all hover:border-[#146637] hover:bg-[#146637] hover:text-white active:scale-95'
                     aria-label='Bulan berikutnya'
                   >
                     <ChevronRight className='h-5 w-5' />
                   </button>
                 </div>
 
-                <div className='mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-white/60 sm:gap-2 sm:text-xs sm:tracking-[0.18em]'>
+                <div className='mt-5 grid grid-cols-7 gap-2 text-center font-sora text-xs font-bold uppercase tracking-wider text-slate-400'>
                   {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((day) => (
                     <div key={day}>{day}</div>
                   ))}
                 </div>
 
-                <div className='mt-3 grid grid-cols-7 gap-1.5 sm:gap-2'>
+                <div className='mt-4 grid grid-cols-7 gap-2'>
                   {calendarDays.map((day, index) => {
                     if (!day) {
-                      return <div key={`empty-${index}`} className='min-h-24 rounded-xl bg-white/5 sm:min-h-28 sm:rounded-2xl' />;
+                      return <div key={`empty-${index}`} className='min-h-24 rounded-2xl bg-gray-50/50' />;
                     }
 
                     const dateKey = getDateKey(day);
@@ -443,47 +440,40 @@ export default function CalendarPage() {
                             setSelectedDateKey(dateKey);
                           }
                         }}
-                        className={`min-h-24 cursor-pointer rounded-xl border p-1.5 text-left transition-colors hover:border-brand-yellow/70 hover:bg-brand-yellow/10 sm:min-h-28 sm:rounded-2xl sm:p-2 ${
-                          isToday ? 'border-brand-yellow bg-brand-yellow/10' : 'border-white/10 bg-white/5'
-                        } ${selectedDateKey === dateKey ? 'ring-2 ring-brand-yellow/60' : ''}`}
+                        className={`min-h-24 cursor-pointer rounded-2xl border p-2 text-left transition-all duration-200 ${
+                          isToday ? 'border-[#146637] bg-[#146637]/5' : 'border-gray-100 bg-white hover:border-[#146637]/40'
+                        } ${selectedDateKey === dateKey ? 'ring-2 ring-[#146637]' : ''}`}
                       >
-                        <div className='flex items-center justify-between gap-1 sm:gap-2'>
+                        <div className='flex items-center justify-between gap-1'>
                           <span
-                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold sm:h-7 sm:w-7 sm:text-sm ${
-                              isToday ? 'bg-brand-yellow text-brand-black' : 'text-white'
+                            className={`inline-flex h-7 w-7 items-center justify-center rounded-full font-sora text-xs font-bold ${
+                              isToday ? 'bg-[#146637] text-white' : 'text-slate-700'
                             }`}
                           >
                             {day.getDate()}
                           </span>
 
                           {dayEvents.length > 0 && (
-                            <span className='rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] text-white/75 sm:px-2 sm:text-[11px]'>
-                              {dayEvents.length} event
+                            <span className='rounded-full bg-[#146637]/10 px-2 py-0.5 font-mono text-[10px] font-bold text-[#146637]'>
+                              {dayEvents.length}
                             </span>
                           )}
                         </div>
 
-                        <div className='mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5'>
-                          {dayEvents.slice(0, 3).map((occurrence) => (
+                        <div className='mt-2 space-y-1.5'>
+                          {dayEvents.slice(0, 2).map((occurrence) => (
                             <div
                               key={`${occurrence.event.event_id}-${occurrence.dateKey}`}
-                              className={`rounded-lg px-1.5 py-1 text-[10px] leading-tight text-white sm:rounded-xl sm:px-2 sm:py-1.5 sm:text-[11px] sm:leading-snug ${
-                                occurrence.event.is_recurring ? 'bg-emerald-400/20 ring-1 ring-emerald-200/40' : 'bg-sky-400/20 ring-1 ring-sky-200/40'
+                              className={`rounded-xl px-2 py-1 text-[11px] leading-tight font-hanken ${
+                                occurrence.event.is_recurring ? 'bg-[#146637]/10 text-[#146637]' : 'bg-sky-50 text-sky-700'
                               }`}
                             >
-                              <div className='flex items-center gap-1'>
-                                <span
-                                  className={`h-1.5 w-1.5 rounded-full ${
-                                    occurrence.event.is_recurring ? 'bg-emerald-300' : 'bg-sky-300'
-                                  }`}
-                                />
-                                <p className='truncate font-semibold'>{occurrence.event.event_name}</p>
-                              </div>
-                              <p className='truncate text-white/70'>{formatTime(occurrence.event.event_time)} WIB</p>
+                              <p className='truncate font-bold'>{occurrence.event.event_name}</p>
+                              <p className='truncate text-[10px] text-slate-500'>{formatTime(occurrence.event.event_time)} WIB</p>
                             </div>
                           ))}
-                          {dayEvents.length > 3 && (
-                            <p className='px-0.5 text-[10px] text-white/70 sm:px-1 sm:text-[11px]'>+{dayEvents.length - 3} event lainnya</p>
+                          {dayEvents.length > 2 && (
+                            <p className='text-[10px] font-semibold text-slate-400'>+{dayEvents.length - 2} lainnya</p>
                           )}
                         </div>
                       </div>
@@ -492,42 +482,43 @@ export default function CalendarPage() {
                 </div>
               </div>
 
-              <aside className='space-y-4 rounded-2xl border border-white/20 bg-white/10 p-4 text-white shadow-md backdrop-blur-sm sm:p-5'>
+              {/* Sidebar Summary */}
+              <aside className='space-y-6 rounded-[25px] border border-gray-100 bg-gray-50/60 p-6 shadow-md'>
                 <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-brand-yellow'>Ringkasan bulan</p>
-                  <h3 className='mt-2 text-xl font-semibold'>{monthLabel}</h3>
+                  <p className='font-sora text-xs font-bold uppercase tracking-wider text-[#146637]'>Ringkasan Bulan</p>
+                  <h3 className='font-sora mt-1 text-2xl font-bold text-slate-900 capitalize'>{monthLabel}</h3>
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
-                  <div className='rounded-2xl bg-black/15 p-3'>
-                    <p className='text-xs text-white/65'>Occurrence</p>
-                    <p className='mt-1 text-2xl font-semibold'>{monthSummary.totalOccurrences}</p>
+                  <div className='rounded-2xl bg-white border border-gray-100 p-4 shadow-sm'>
+                    <p className='font-hanken text-xs text-slate-500'>Occurrence</p>
+                    <p className='font-sora mt-1 text-2xl font-extrabold text-slate-900'>{monthSummary.totalOccurrences}</p>
                   </div>
-                  <div className='rounded-2xl bg-black/15 p-3'>
-                    <p className='text-xs text-white/65'>Hari aktif</p>
-                    <p className='mt-1 text-2xl font-semibold'>{monthSummary.uniqueDays}</p>
+                  <div className='rounded-2xl bg-white border border-gray-100 p-4 shadow-sm'>
+                    <p className='font-hanken text-xs text-slate-500'>Hari Aktif</p>
+                    <p className='font-sora mt-1 text-2xl font-extrabold text-slate-900'>{monthSummary.uniqueDays}</p>
                   </div>
-                  <div className='rounded-2xl bg-black/15 p-3'>
-                    <p className='text-xs text-white/65'>Berulang</p>
-                    <p className='mt-1 text-2xl font-semibold'>{monthSummary.recurringOccurrences}</p>
+                  <div className='rounded-2xl bg-white border border-gray-100 p-4 shadow-sm'>
+                    <p className='font-hanken text-xs text-slate-500'>Berulang</p>
+                    <p className='font-sora mt-1 text-2xl font-extrabold text-slate-900'>{monthSummary.recurringOccurrences}</p>
                   </div>
-                  <div className='rounded-2xl bg-black/15 p-3'>
-                    <p className='text-xs text-white/65'>Filter aktif</p>
-                    <p className='mt-1 text-lg font-semibold capitalize'>{activeFilter}</p>
+                  <div className='rounded-2xl bg-white border border-gray-100 p-4 shadow-sm'>
+                    <p className='font-hanken text-xs text-slate-500'>Filter</p>
+                    <p className='font-sora mt-1 text-base font-bold text-[#146637] capitalize'>{activeFilter}</p>
                   </div>
                 </div>
 
-                <div className='rounded-2xl bg-black/15 p-3'>
-                  <div className='flex items-center justify-between gap-3'>
+                {/* Selected Day Info */}
+                <div className='rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm'>
+                  <div className='flex items-center justify-between gap-3 border-b border-gray-100 pb-2.5'>
                     <div>
-                      <p className='text-sm font-semibold text-white'>Tanggal terpilih</p>
-                      <p className='mt-1 text-xs text-white/70'>Klik tanggal di kalender untuk melihat daftarnya.</p>
+                      <p className='font-sora text-sm font-bold text-slate-900'>Tanggal Terpilih</p>
                     </div>
                     {selectedDay && (
                       <button
                         type='button'
                         onClick={() => setSelectedDateKey(null)}
-                        className='rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-white/20'
+                        className='rounded-full bg-gray-100 px-3 py-1 font-sora text-xs font-semibold text-slate-600 hover:bg-gray-200 transition-colors'
                       >
                         Hapus
                       </button>
@@ -535,74 +526,48 @@ export default function CalendarPage() {
                   </div>
 
                   {selectedDay ? (
-                    <div className='mt-3 space-y-2'>
-                      <p className='text-sm font-semibold text-brand-yellow'>{formatShortDate(selectedDay)}</p>
+                    <div className='space-y-3'>
+                      <p className='font-sora text-sm font-bold text-[#146637]'>{formatShortDate(selectedDay)}</p>
 
                       {selectedDayEvents.length === 0 ? (
-                        <div className='rounded-2xl bg-black/15 p-4 text-sm text-white/75'>
-                          Tidak ada event pada tanggal ini.
-                        </div>
+                        <p className='font-hanken text-xs text-slate-500'>Tidak ada event pada tanggal ini.</p>
                       ) : (
-                        <div className='space-y-2'>
+                        <div className='space-y-2.5'>
                           {selectedDayEvents.map((occurrence) => (
                             <div
                               key={`${occurrence.event.event_id}-${occurrence.dateKey}`}
-                              className={`rounded-2xl p-3 ${
-                                occurrence.event.is_recurring ? 'bg-emerald-400/15 ring-1 ring-emerald-200/30' : 'bg-sky-400/15 ring-1 ring-sky-200/30'
-                              }`}
+                              className='rounded-xl bg-gray-50 border border-gray-100 p-3 space-y-1'
                             >
-                              <div className='flex items-start justify-between gap-3'>
-                                <div>
-                                  <p className='font-semibold text-white'>{occurrence.event.event_name}</p>
-                                  <p className='mt-1 text-xs text-white/70'>{formatTime(occurrence.event.event_time)} WIB</p>
-                                </div>
-                                <span className='rounded-full bg-black/20 px-2 py-1 text-[11px] text-white/75'>
+                              <div className='flex items-start justify-between gap-2'>
+                                <p className='font-sora text-xs font-bold text-slate-900'>{occurrence.event.event_name}</p>
+                                <span className='rounded-full bg-[#146637]/10 px-2 py-0.5 font-sora text-[10px] font-semibold text-[#146637]'>
                                   {occurrence.event.is_recurring ? 'Berulang' : 'Non-berulang'}
                                 </span>
                               </div>
-
-                              <p className='mt-2 text-xs text-white/70'>{occurrence.event.location}</p>
-
-                              {occurrence.event.notes && (
-                                <p className='mt-2 rounded-xl bg-black/15 px-3 py-2 text-xs text-white/85'>
-                                  {occurrence.event.notes}
-                                </p>
-                              )}
+                              <p className='font-hanken text-xs text-slate-500'>{formatTime(occurrence.event.event_time)} WIB • {occurrence.event.location}</p>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className='mt-3 rounded-2xl bg-black/15 p-4 text-sm text-white/75'>
-                      Belum ada tanggal dipilih.
-                    </div>
+                    <p className='font-hanken text-xs text-slate-500'>Klik tanggal pada kalender untuk melihat rincian agenda.</p>
                   )}
                 </div>
 
+                {/* Upcoming Events */}
                 <div className='space-y-3'>
-                  <div className='flex items-center justify-between'>
-                    <p className='text-sm font-semibold text-white'>Event terdekat</p>
-                    <span className='text-xs text-white/60'>{monthSummary.upcomingOccurrences.length} item</span>
-                  </div>
-
+                  <p className='font-sora text-sm font-bold text-slate-900'>Event Terdekat</p>
                   {monthSummary.upcomingOccurrences.length === 0 ? (
-                    <div className='rounded-2xl bg-black/15 p-4 text-sm text-white/75'>
-                      Tidak ada event berikutnya pada bulan ini.
-                    </div>
+                    <p className='font-hanken text-xs text-slate-500'>Tidak ada event berikutnya bulan ini.</p>
                   ) : (
-                    <div className='space-y-2'>
+                    <div className='space-y-2.5'>
                       {monthSummary.upcomingOccurrences.map((occurrence) => (
-                        <div key={`${occurrence.event.event_id}-${occurrence.dateKey}`} className='rounded-2xl bg-black/15 p-3'>
-                          <p className='text-sm font-semibold'>{occurrence.event.event_name}</p>
-                          <p className='mt-1 text-xs text-white/70'>
+                        <div key={`${occurrence.event.event_id}-${occurrence.dateKey}`} className='rounded-2xl bg-white border border-gray-100 p-3.5 shadow-sm space-y-1'>
+                          <p className='font-sora text-xs font-bold text-slate-900'>{occurrence.event.event_name}</p>
+                          <p className='font-hanken text-xs text-slate-500'>
                             {formatDateFromDate(occurrence.occurrenceDate)} • {formatTime(occurrence.event.event_time)} WIB
                           </p>
-                          {occurrence.event.is_recurring && (
-                            <p className='mt-1 text-xs text-emerald-100'>
-                              {formatRecurrenceLabel(occurrence.event.recurrence_type, occurrence.event.recurrence_interval)}
-                            </p>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -612,9 +577,13 @@ export default function CalendarPage() {
             </div>
           )}
 
-          <BackButton href='/' />
+          <div className='pt-6'>
+            <BackButton href='/' />
+          </div>
         </div>
-      </div>
-    </LinksLayoutWrapper>
+      </main>
+
+      <Footer />
+    </div>
   );
 }

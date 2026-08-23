@@ -87,17 +87,14 @@ export default function FolderCard({
       <button
         onClick={handleClick}
         className={cn(
-          // Base styles
-          'w-full rounded-lg px-6 py-4 text-center font-medium text-white shadow-md transition-all duration-200',
-          'hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
-          // Orange/terracotta background matching design
-          'bg-gradient-to-r from-brand-red-700 to-brand-red hover:from-brand-red-700 hover:to-brand-red-700',
+          'w-full rounded-2xl px-6 py-4 text-left font-sora font-bold text-slate-900 border border-gray-100 bg-white shadow-sm transition-all duration-200',
+          'hover:border-[#146637] hover:shadow-md hover:scale-[1.01] active:scale-[0.99]',
           className
         )}
       >
-        <span className='inline-flex items-center gap-2 text-sm sm:text-base md:text-lg'>
+        <span className='inline-flex items-center justify-between w-full text-sm sm:text-base'>
           <span>{title}</span>
-          {isLocked && <Lock className='h-4 w-4' aria-label='Terkunci' />}
+          {isLocked && <Lock className='h-4 w-4 text-[#146637]' aria-label='Terkunci' />}
         </span>
       </button>
 

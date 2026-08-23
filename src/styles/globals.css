@@ -3,7 +3,14 @@
 
 @theme {
   /* Font configuration */
-  --font-primary: 'Inter', system-ui, sans-serif;
+  --font-primary: var(--font-hanken), 'Inter', system-ui, sans-serif;
+  --font-sora: var(--font-sora), sans-serif;
+  --font-hanken: var(--font-hanken), sans-serif;
+  --font-fraunces: var(--font-fraunces), serif;
+
+  /* Color Hex: 146637 */
+  --color-jmmi-green: #146637;
+  --color-jmmi-green-hover: #0e4a28;
 
   /* Primary color palette - converted to modern oklch format */
   --color-primary-50: oklch(0.97 0.024 213.79);
@@ -31,8 +38,8 @@
   --color-brand-yellow: #f5ba6e;
   --color-brand-yellow-700: #de9513;
 
-  --color-brand-green: #45513b;
-  --color-brand-green-700: #2e371a;
+  --color-brand-green: #146637;
+  --color-brand-green-700: #0e4a28;
 
   --color-brand-blue: #7b8caa;
   --color-brand-blue-700: #265088;

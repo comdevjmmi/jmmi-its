@@ -2,105 +2,131 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import NextImage from '@/components/NextImage';
 
+const navLinks = [
+  { href: '/', label: 'Beranda' },
+  { href: '/finance', label: 'Transparansi Keuangan' },
+  { href: '/kalender', label: 'Kalender' },
+  { href: '/contact', label: 'Kontak' },
+  { href: '/j-fest', label: 'J-Fest', isCustomColor: true, color: '#4320B2' },
+];
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b border-white/10 bg-brand-green/80 backdrop-blur-md'>
-      <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8'>
-        <Link href='/' className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-full bg-white p-1 shadow-md'>
+    <header className='sticky top-0 z-50 w-full border-b border-white/20 bg-white/60 text-slate-800 shadow-sm backdrop-blur-md transition-all'>
+      <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8 lg:px-16'>
+        {/* Brand Container: Logo + JMMI ITS Text */}
+        <Link href='/' className='flex items-center gap-3 group'>
+          <div className='flex items-center justify-center shrink-0'>
             <NextImage
-              src='/images/logo.png'
+              src='/images/navbar/logo.png'
               alt='JMMI ITS Logo'
-              width={36}
-              height={36}
-              className='h-8 w-8 object-contain'
+              width={34}
+              height={31}
+              className='h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-105'
             />
           </div>
-          <div className='text-left'>
-            <span className='block text-base font-bold leading-tight text-white'>
-              JMMI ITS
-            </span>
-            <span className='block text-xs text-white/70'>
-              Kabinet Ekselensi 2026
-            </span>
-          </div>
+          <span className='font-sora text-2xl sm:text-3xl font-extrabold leading-none tracking-tight text-[#146637]'>
+            JMMI ITS
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className='hidden items-center gap-8 md:flex'>
-          <Link
-            href='/'
-            className='text-sm font-medium text-white transition-colors hover:text-brand-yellow'
-          >
-            Beranda
-          </Link>
-          <Link
-            href='/about'
-            className='text-sm font-medium text-white/80 transition-colors hover:text-brand-yellow'
-          >
-            Profil & Visi Misi
-          </Link>
-          <Link
-            href='/kalender'
-            className='text-sm font-medium text-white/80 transition-colors hover:text-brand-yellow'
-          >
-            Agenda Kegiatan
-          </Link>
-          <Link
-            href='/finance'
-            className='text-sm font-medium text-white/80 transition-colors hover:text-brand-yellow'
-          >
-            Transparansi Keuangan
-          </Link>
+        {/* Desktop Navigation Links with Underline Hover Animation */}
+        <nav className='hidden items-center gap-6 lg:gap-8 md:flex'>
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            const linkColor = link.isCustomColor ? link.color : '#146637';
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{ color: isActive || link.isCustomColor ? linkColor : undefined }}
+                className={`group relative py-1 font-hanken text-base transition-colors duration-200 ${
+                  isActive
+                    ? 'font-bold'
+                    : 'font-normal text-[#494456]'
+                } ${link.isCustomColor ? 'font-bold font-sora hover:opacity-80' : 'hover:text-[#146637]'}`}
+              >
+                <span>{link.label}</span>
+                {/* Animated Line Indicator */}
+                <span
+                  style={{ backgroundColor: linkColor }}
+                  className={`absolute bottom-0 left-0 h-[2px] transition-all duration-300 ease-out ${
+                    isActive
+                      ? 'w-full'
+                      : 'w-0 group-hover:w-full'
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Mobile menu button */}
+        {/* Right CTA Button: Masuk */}
+        <div className='hidden items-center md:flex'>
+          <Link
+            href='/login'
+            className='inline-flex items-center justify-center rounded-full bg-[#146637] px-6 py-2 font-sora text-xs font-semibold uppercase tracking-widest text-white shadow-md transition-all hover:bg-[#0e4a28] hover:shadow-lg active:scale-95'
+          >
+            Masuk
+          </Link>
+        </div>
+
+        {/* Mobile Hamburger Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className='inline-flex items-center justify-center rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white md:hidden'
+          className='inline-flex items-center justify-center rounded-lg p-2 text-[#146637] transition-colors hover:bg-[#146637]/10 md:hidden'
           aria-label='Toggle menu'
         >
           {isOpen ? <X className='h-6 w-6' /> : <Menu className='h-6 w-6' />}
         </button>
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Menu Drawer */}
       {isOpen && (
-        <div className='border-b border-white/10 bg-brand-green px-4 pb-6 pt-2 md:hidden'>
+        <div className='border-t border-gray-200/60 bg-white/95 px-6 pb-6 pt-4 shadow-xl backdrop-blur-lg md:hidden animate-in slide-in-from-top-2'>
           <div className='flex flex-col gap-4'>
-            <Link
-              href='/'
-              onClick={() => setIsOpen(false)}
-              className='text-sm font-medium text-white hover:text-brand-yellow'
-            >
-              Beranda
-            </Link>
-            <Link
-              href='/about'
-              onClick={() => setIsOpen(false)}
-              className='text-sm font-medium text-white/80 hover:text-brand-yellow'
-            >
-              Profil & Visi Misi
-            </Link>
-            <Link
-              href='/kalender'
-              onClick={() => setIsOpen(false)}
-              className='text-sm font-medium text-white/80 hover:text-brand-yellow'
-            >
-              Agenda Kegiatan
-            </Link>
-            <Link
-              href='/finance'
-              onClick={() => setIsOpen(false)}
-              className='text-sm font-medium text-white/80 hover:text-brand-yellow'
-            >
-              Transparansi Keuangan
-            </Link>
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              const linkColor = link.isCustomColor ? link.color : '#146637';
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  style={{
+                    color: link.isCustomColor ? linkColor : undefined,
+                    backgroundColor: isActive ? (link.isCustomColor ? `${linkColor}15` : '#14663715') : undefined,
+                  }}
+                  className={`relative font-hanken text-base transition-colors px-3 py-2 rounded-lg ${
+                    isActive
+                      ? 'font-bold'
+                      : link.isCustomColor
+                      ? 'font-bold font-sora'
+                      : 'font-normal text-[#494456] hover:text-[#146637] hover:bg-gray-100/80'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className='pt-2 border-t border-gray-100'>
+              <Link
+                href='/login'
+                onClick={() => setIsOpen(false)}
+                className='flex w-full items-center justify-center rounded-full bg-[#146637] py-2.5 font-sora text-xs font-semibold uppercase tracking-widest text-white shadow-md transition-colors hover:bg-[#0e4a28]'
+              >
+                Masuk
+              </Link>
+            </div>
           </div>
         </div>
       )}

@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import Button from '@/components/buttons/Button';
 import useAuthStore from '@/stores/useAuthStore';
-import LinksLayoutWrapper from '@/components/links/LinksLayoutWrapper';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import { useAdminLogin } from '../admin/hook/useAdmin';
 import { showToast, DANGER_TOAST, SUCCESS_TOAST } from '@/components/Toast';
 
@@ -68,76 +68,83 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <LinksLayoutWrapper>
-      <div className='flex min-h-screen items-center justify-center px-4'>
-        <div className='w-full max-w-md'>
-        <div className='mb-8 text-center'>
-          <h1 className='text-3xl font-bold text-white'>Admin Login</h1>
-          <p className='mt-2 text-slate-200'>
-            Manage financial data and transactions
-          </p>
-        </div>
+    <div className='flex min-h-screen flex-col bg-white font-primary text-slate-800'>
+      <Navbar />
 
-        <form
-          onSubmit={handleSubmit}
-          className='rounded-lg bg-white p-8 shadow-lg'
-        >
-          <div className='mb-6'>
-            <label htmlFor='email' className='block text-sm font-medium text-slate-700'>
-              Email Address
-            </label>
-            <input
-              id='email'
-              type='email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder='Enter your email'
-              className='mt-2 w-full rounded-md border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-300'
-            />
+      <main className='relative z-10 flex-1 flex items-center justify-center py-12 px-4 sm:px-8'>
+        <div className='w-full max-w-md space-y-8'>
+          <div className='text-center space-y-3'>
+            <h1 className='font-sora text-3xl sm:text-4xl font-extrabold text-[#146637] tracking-tight'>
+              Masuk Admin
+            </h1>
+            <p className='font-hanken text-base text-slate-600'>
+              Portal khusus pengurus JMMI ITS untuk pengelolaan data & laporan.
+            </p>
           </div>
 
-          <div className='mb-8'>
-            <label htmlFor='password' className='block text-sm font-medium text-slate-700'>
-              Password
-            </label>
-            <div className='relative mt-2'>
-              <input
-                id='password'
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder='••••••••'
-                className='w-full rounded-md border border-slate-300 bg-slate-50 px-4 py-2 pr-12 text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-300'
-              />
-              <button
-                type='button'
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className='absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 transition-colors hover:text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-blue-300'
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          <Button
-            type='submit'
-            variant='primary'
-            className='w-full'
-            isLoading={isPending}
-            disabled={isPending}
+          <form
+            onSubmit={handleSubmit}
+            className='rounded-[25px] border border-gray-100 bg-white p-8 shadow-xl space-y-6'
           >
-            {isPending ? 'Logging in...' : 'Login'}
-          </Button>
-        </form>
+            <div className='space-y-2'>
+              <label htmlFor='email' className='block font-sora text-xs font-semibold uppercase tracking-wider text-slate-700'>
+                Email Address
+              </label>
+              <input
+                id='email'
+                type='email'
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='Masukkan email admin'
+                className='w-full rounded-2xl border border-gray-200 bg-gray-50/50 px-5 py-3.5 font-sora text-sm text-slate-900 placeholder:text-gray-400 focus:border-[#146637] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146637]/20 transition-all shadow-sm'
+              />
+            </div>
 
-        <div className='mt-6 text-center'>
-          <p className='text-sm text-white'>
-            with love from BPI Ekselensi 2026
-          </p>
+            <div className='space-y-2'>
+              <label htmlFor='password' className='block font-sora text-xs font-semibold uppercase tracking-wider text-slate-700'>
+                Password
+              </label>
+              <div className='relative'>
+                <input
+                  id='password'
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder='••••••••'
+                  className='w-full rounded-2xl border border-gray-200 bg-gray-50/50 px-5 py-3.5 pr-12 font-sora text-sm text-slate-900 placeholder:text-gray-400 focus:border-[#146637] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146637]/20 transition-all shadow-sm'
+                />
+                <button
+                  type='button'
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className='absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-[#146637] transition-colors'
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type='submit'
+              disabled={isPending}
+              className='w-full inline-flex items-center justify-center rounded-full bg-[#146637] px-6 py-3.5 font-sora text-xs font-semibold uppercase tracking-widest text-white shadow-md transition-all hover:bg-[#0e4a28] hover:shadow-lg active:scale-95 disabled:opacity-70'
+            >
+              {isPending ? 'Logging in...' : 'Masuk'}
+            </button>
+          </form>
+
+          <div className='text-center'>
+            <p className='font-hanken text-xs text-slate-400'>
+              BPI Kabinet Ekselensi 2026 • JMMI ITS
+            </p>
+          </div>
         </div>
-        </div>
-      </div>
-    </LinksLayoutWrapper>
+      </main>
+
+      <Footer />
+    </div>
   );
 }
+

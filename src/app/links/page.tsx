@@ -4,7 +4,8 @@ import * as React from 'react';
 
 import FolderCard from '@/components/links/FolderCard';
 import LinkButton from '@/components/links/LinkButton';
-import ProfileHeader from '@/components/links/ProfileHeader';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import Loading from '@/components/Loading';
 import { DANGER_TOAST, showToast } from '@/components/Toast';
 import Typography from '@/components/Typography';
@@ -86,42 +87,50 @@ export default function LinksPage() {
   }
 
   return (
-    <>
-      {/* Main Content */}
-      <div className='relative z-10 flex flex-col items-center px-4 py-8 sm:py-12'>
-        {/* Profile section with reusable component */}
-        <ProfileHeader />
+    <div className='flex min-h-screen flex-col bg-white font-primary text-slate-800'>
+      <Navbar />
 
-        {/* Content container */}
-        <div className='w-full max-w-md md:max-w-3xl lg:max-w-5xl space-y-8'>
-          {/* Static About Link */}
-          <div className='space-y-4'>
-            <div className='space-y-3'>
-              <LinkButton
-                title='Tentang Kabinet Ekselensi'
-                url='/about'
-                variant='orange'
-                newTab={false}
-              />
-              <LinkButton
-                title='Transparansi Keuangan'
-                url='/finance'
-                variant='general'
-                newTab={false}
-              />
-                <LinkButton
-                  title='Kalender Kegiatan'
-                url='/kalender'
-                variant='general'
-                newTab={false}
-              />
-            </div>
+      <main className='relative z-10 flex-1 py-12 px-4 sm:px-8 lg:px-16'>
+        <div className='mx-auto max-w-[1312px] space-y-10'>
+          {/* Header */}
+          <div className='space-y-3 max-w-2xl'>
+            <h1 className='font-sora text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#146637] tracking-tight'>
+              Portal Link & Resource
+            </h1>
+            <p className='font-hanken text-lg sm:text-xl text-slate-600 leading-relaxed'>
+              Akses cepat ke berbagai sumber daya, tautan penting, serta berkas resmi JMMI ITS.
+            </p>
+          </div>
+
+          {/* Quick Navigation Buttons */}
+          <div className='grid gap-4 sm:grid-cols-3'>
+            <LinkButton
+              title='Tentang Kabinet Ekselensi'
+              url='/about'
+              variant='orange'
+              newTab={false}
+            />
+            <LinkButton
+              title='Transparansi Keuangan'
+              url='/finance'
+              variant='general'
+              newTab={false}
+            />
+            <LinkButton
+              title='Kalender Kegiatan'
+              url='/kalender'
+              variant='general'
+              newTab={false}
+            />
           </div>
 
           {/* General Links section */}
           {general_links.length > 0 && (
-            <div className='space-y-4'>
-              <div className='space-y-3'>
+            <div className='space-y-4 pt-4'>
+              <h2 className='font-sora text-xl font-bold text-slate-900 border-b border-gray-100 pb-3'>
+                Tautan Utama
+              </h2>
+              <div className='grid gap-3.5 sm:grid-cols-2'>
                 {general_links.map((link) => (
                   <LinkButton
                     key={link.link_id}
@@ -149,23 +158,13 @@ export default function LinksPage() {
             }
 
             return (
-              <div key={category.category_id} className='space-y-4'>
-                <div className='relative flex items-center justify-center my-6'>
-                  <div className='absolute border-t border-white/30 w-full'></div>
-                  <div className='relative bg-brand-green px-4'>
-                    <Typography
-                      as='h2'
-                      variant='h6'
-                      className='text-center text-white'
-                      weight='medium'
-                    >
-                      {category.title}
-                    </Typography>
-                  </div>
-                </div>
+              <div key={category.category_id} className='space-y-5 pt-4'>
+                <h2 className='font-sora text-xl font-bold text-slate-900 border-b border-gray-100 pb-3'>
+                  {category.title}
+                </h2>
 
                 {categoryDirectLinks.length > 0 && (
-                  <div className='space-y-3'>
+                  <div className='grid gap-3 sm:grid-cols-2'>
                     {categoryDirectLinks.map((link) => (
                       <LinkButton
                         key={link.link_id}
@@ -177,7 +176,7 @@ export default function LinksPage() {
                   </div>
                 )}
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                   {categoryFolders?.map((folder) => (
                     <FolderCard
                       key={folder.folder_id}
@@ -193,21 +192,11 @@ export default function LinksPage() {
 
           {/* Uncategorized Folders */}
           {foldersByCategory.uncategorized.length > 0 && (
-            <div className='space-y-4'>
-              <div className='relative flex items-center justify-center my-6'>
-                <div className='absolute border-t border-white/30 w-full'></div>
-                <div className='relative bg-brand-green px-4'>
-                  <Typography
-                    as='h2'
-                    variant='h6'
-                    className='text-center text-white'
-                    weight='medium'
-                  >
-                    Lainnya
-                  </Typography>
-                </div>
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <div className='space-y-5 pt-4'>
+              <h2 className='font-sora text-xl font-bold text-slate-900 border-b border-gray-100 pb-3'>
+                Folder Lainnya
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {foldersByCategory.uncategorized.map((folder) => (
                   <FolderCard
                     key={folder.folder_id}
@@ -220,10 +209,10 @@ export default function LinksPage() {
             </div>
           )}
         </div>
+      </main>
 
-        {/* Bottom spacing */}
-        <div className='h-12'></div>
-      </div>
-    </>
+      <Footer />
+    </div>
   );
 }
+
