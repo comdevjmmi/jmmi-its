@@ -5,6 +5,7 @@ import { Instagram, Phone, Send, Twitter, Linkedin } from 'lucide-react';
 import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
 
 export default function ContactUsSection() {
+  const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -31,7 +32,7 @@ export default function ContactUsSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !message) return;
+    if (!name || !email || !message) return;
 
     setIsSubmitting(true);
 
@@ -41,7 +42,7 @@ export default function ContactUsSection() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, message }),
+        body: JSON.stringify({ name, email, message }),
       });
 
       const data = await response.json();
@@ -50,6 +51,7 @@ export default function ContactUsSection() {
         throw new Error(data.error || 'Gagal mengirim pesan');
       }
 
+      setName('');
       setEmail('');
       setMessage('');
       showToast('Pesan berhasil terkirim! Terima kasih telah menghubungi JMMI ITS.', SUCCESS_TOAST);
@@ -90,6 +92,22 @@ export default function ContactUsSection() {
             }`}
           >
             <form onSubmit={handleSubmit} className='space-y-6'>
+              {/* Name Input Field */}
+              <div className='space-y-2'>
+                <label htmlFor='contact-name' className='block font-sora text-sm font-semibold text-slate-800'>
+                  Nama Anda
+                </label>
+                <input
+                  id='contact-name'
+                  type='text'
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder='Tuliskan nama lengkap anda'
+                  className='w-full rounded-2xl border border-gray-200 bg-gray-50/50 px-5 py-4 font-sora text-base text-slate-900 placeholder:text-gray-400 focus:border-[#146637] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146637]/20 transition-all shadow-sm'
+                />
+              </div>
+
               {/* Email Input Field */}
               <div className='space-y-2'>
                 <label htmlFor='contact-email' className='block font-sora text-sm font-semibold text-slate-800'>

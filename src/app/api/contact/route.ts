@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, message } = await request.json();
+    const { name, email, message } = await request.json();
 
     if (!email || !message) {
       return NextResponse.json(
@@ -36,16 +36,18 @@ export async function POST(request: NextRequest) {
     });
 
     const senderEmail = process.env.SMTP_SENDER_EMAIL || 'kabinetjmmits2026@gmail.com';
+    const senderName = name ? `${name} via JMMI ITS Contact` : 'JMMI ITS Contact';
 
     await transporter.sendMail({
-      from: `"JMMI ITS Contact" <${senderEmail}>`,
+      from: `"${senderName}" <${senderEmail}>`,
       replyTo: email,
       to: receiver,
-      subject: `Pesan Baru Contact Us dari ${email}`,
+      subject: `Pesan Baru Contact Us dari ${name || email}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #146637;">Pesan Baru Contact Us JMMI ITS</h2>
-          <p><strong>Pengirim (Email):</strong> ${email}</p>
+          ${name ? `<p><strong>Nama Pengirim:</strong> ${name}</p>` : ''}
+          <p><strong>Email Pengirim:</strong> ${email}</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           <p><strong>Isi Pesan:</strong></p>
           <p style="white-space: pre-wrap; background: #f9f9f9; padding: 15px; border-radius: 8px;">${message}</p>
