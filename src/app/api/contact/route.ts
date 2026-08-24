@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Pesan berhasil terkirim!' });
   } catch (error: unknown) {
+    console.error('[SMTP Contact API Error]:', error);
     const errorMessage = error instanceof Error ? error.message : 'Gagal mengirim email';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
