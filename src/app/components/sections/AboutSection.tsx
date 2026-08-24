@@ -91,7 +91,10 @@ export default function AboutSection({
                 alt={aboutTitle}
                 width={600}
                 height={450}
-                className='h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105'
+                className='h-full w-full'
+                classNames={{
+                  image: 'h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105',
+                }}
               />
               <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
             </div>
@@ -114,7 +117,10 @@ export default function AboutSection({
                 alt={visionTitle}
                 width={600}
                 height={450}
-                className='h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105'
+                className='h-full w-full'
+                classNames={{
+                  image: 'h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105',
+                }}
               />
               <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
             </div>
