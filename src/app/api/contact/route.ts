@@ -35,8 +35,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const senderEmail = process.env.SMTP_SENDER_EMAIL || 'kabinetjmmits2026@gmail.com';
+
     await transporter.sendMail({
-      from: `"JMMI ITS Contact" <${user}>`,
+      from: `"JMMI ITS Contact" <${senderEmail}>`,
       replyTo: email,
       to: receiver,
       subject: `Pesan Baru Contact Us dari ${email}`,
