@@ -46,9 +46,11 @@ export default function ProfileVideoSection({
         <NextImage
           src={backgroundImage}
           alt='Profile Video Background'
-          width={1920}
-          height={1080}
-          className='h-full w-full object-cover object-center'
+          layout='fill'
+          className='h-full w-full'
+          classNames={{
+            image: 'h-full w-full object-cover object-center',
+          }}
           priority
         />
         {/* Soft Ambient Overlay for contrast */}
