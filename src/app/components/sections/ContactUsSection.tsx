@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Instagram, Phone, Send, Twitter, Linkedin } from 'lucide-react';
-import { showToast, SUCCESS_TOAST } from '@/components/Toast';
+import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
 
 export default function ContactUsSection() {
   const [email, setEmail] = React.useState('');
@@ -29,18 +29,36 @@ export default function ContactUsSection() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !message) return;
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, message }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Gagal mengirim pesan');
+      }
+
       setEmail('');
       setMessage('');
       showToast('Pesan berhasil terkirim! Terima kasih telah menghubungi JMMI ITS.', SUCCESS_TOAST);
-    }, 800);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan saat mengirim pesan.';
+      showToast(errorMessage, DANGER_TOAST);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
