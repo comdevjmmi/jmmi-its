@@ -12,6 +12,8 @@ const navLinks = [
   { href: '/kalender', label: 'Kalender' },
   { href: '/contact', label: 'Kontak' },
   { href: '/j-fest', label: 'J-Fest', isCustomColor: true, color: '#4320B2' },
+  { href: 'https://shuttle.jmmi-its.com/', label: 'Shuttle', isExternal: true },
+  { href: 'https://www.rdk-its.com/', label: 'RDK', isExternal: true, isCustomColor: true, color: '#9e2a2f' },
 ];
 
 export default function Navbar() {
@@ -38,10 +40,29 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation Links with Underline Hover Animation */}
-        <nav className='hidden items-center gap-6 lg:gap-8 md:flex'>
+        <nav className='hidden items-center gap-5 lg:gap-7 md:flex'>
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             const linkColor = link.isCustomColor ? link.color : '#146637';
+
+            if (link.isExternal) {
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  style={{ color: link.isCustomColor ? linkColor : undefined }}
+                  className='group relative py-1 font-hanken text-base font-normal hover:opacity-80 transition-colors duration-200'
+                >
+                  <span>{link.label}</span>
+                  <span
+                    style={{ backgroundColor: linkColor }}
+                    className='absolute bottom-0 left-0 h-[2px] w-0 transition-all duration-300 ease-out group-hover:w-full'
+                  />
+                </a>
+              );
+            }
 
             return (
               <Link
@@ -96,6 +117,24 @@ export default function Navbar() {
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const linkColor = link.isCustomColor ? link.color : '#146637';
+
+              if (link.isExternal) {
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    onClick={() => setIsOpen(false)}
+                    style={{
+                      color: link.isCustomColor ? linkColor : undefined,
+                    }}
+                    className='relative font-hanken text-base font-normal px-3 py-2 rounded-lg hover:bg-gray-100/80 transition-colors'
+                  >
+                    {link.label}
+                  </a>
+                );
+              }
 
               return (
                 <Link
