@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { useState } from 'react';
+
 import NextImage from '@/components/NextImage';
 
 const navLinks = [
@@ -12,7 +13,7 @@ const navLinks = [
   { href: '/kalender', label: 'Kalender' },
   { href: '/contact', label: 'Kontak' },
   { href: '/j-fest', label: 'J-Fest', isCustomColor: true, color: '#4320B2' },
-  { href: '/jmmicup', label: 'JMMI Cup', isCustomColor: true, color: '#4320B2' },
+  { href: 'https://jmmicup2026.vercel.app/', label: 'JMMI Cup', isExternal: true, isCustomColor: true, color: '#4320B2' },
   { href: 'https://shuttle.jmmi-its.com/', label: 'Shuttle', isExternal: true },
   { href: 'https://www.rdk-its.com/', label: 'RDK', isExternal: true, isCustomColor: true, color: '#9e2a2f' },
 ];

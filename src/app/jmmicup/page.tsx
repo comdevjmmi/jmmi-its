@@ -1,18 +1,20 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 const title = 'JMMI Cup 2026';
 const description = 'Halaman JMMI Cup 2026 JMMI ITS untuk mengakses microsite kompetisi dan informasi kegiatan.';
+const JMMICUP_URL = 'https://jmmicup2026.vercel.app/';
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: '/jmmicup',
+    canonical: JMMICUP_URL,
   },
   openGraph: {
     title,
     description,
-    url: '/jmmicup',
+    url: JMMICUP_URL,
   },
   twitter: {
     title,
@@ -21,15 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function JMMICupPage() {
-  return (
-    <div className='fixed inset-0 z-50 h-screen w-screen bg-white overflow-hidden'>
-      <iframe
-        src='https://jmmicup2026.vercel.app/'
-        title='JMMI Cup 2026'
-        className='h-full w-full border-0'
-        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-        allowFullScreen
-      />
-    </div>
-  );
+  redirect(JMMICUP_URL);
 }
