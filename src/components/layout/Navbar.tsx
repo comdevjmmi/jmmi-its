@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/kalender', label: 'Kalender' },
   { href: '/contact', label: 'Kontak' },
   { href: '/j-fest', label: 'J-Fest', isCustomColor: true, color: '#4320B2' },
+  { href: '/jmmicup', label: 'JMMI Cup', isCustomColor: true, color: '#4320B2' },
   { href: 'https://shuttle.jmmi-its.com/', label: 'Shuttle', isExternal: true },
   { href: 'https://www.rdk-its.com/', label: 'RDK', isExternal: true, isCustomColor: true, color: '#9e2a2f' },
 ];
