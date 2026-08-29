@@ -1,6 +1,23 @@
-export const metadata = {
-  title: 'JMMI Cup 2026 | JMMI ITS',
-  description: 'JMMI Cup Spesial JMMI ITS 2026',
+import { Metadata } from 'next';
+
+const title = 'JMMI Cup 2026';
+const description = 'Halaman JMMI Cup 2026 JMMI ITS untuk mengakses microsite kompetisi dan informasi kegiatan.';
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: {
+    canonical: '/jmmicup',
+  },
+  openGraph: {
+    title,
+    description,
+    url: '/jmmicup',
+  },
+  twitter: {
+    title,
+    description,
+  },
 };
 
 export default function JMMICupPage() {

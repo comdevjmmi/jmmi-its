@@ -1,6 +1,23 @@
-export const metadata = {
-  title: 'J-Fest 2026 | JMMI ITS',
-  description: 'Festival & Agenda Spesial JMMI ITS 2026',
+import { Metadata } from 'next';
+
+const title = 'J-Fest 2026';
+const description = 'Halaman J-Fest 2026 JMMI ITS untuk mengakses microsite festival dan agenda kegiatan spesial.';
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: {
+    canonical: '/j-fest',
+  },
+  openGraph: {
+    title,
+    description,
+    url: '/j-fest',
+  },
+  twitter: {
+    title,
+    description,
+  },
 };
 
 export default function JFestPage() {
