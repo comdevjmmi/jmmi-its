@@ -1,3 +1,5 @@
+import { Metadata } from 'next';
+
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import {
@@ -7,6 +9,11 @@ import {
   CabinetHistorySection,
   ContactUsSection,
 } from '@/app/components/sections';
+
+export const metadata: Metadata = {
+  title: 'Beranda',
+  description: 'Halaman utama JMMI ITS berisi profil singkat, sejarah kabinet, dan akses informasi penting.',
+};
 
 export default function HomePage() {
   return (
