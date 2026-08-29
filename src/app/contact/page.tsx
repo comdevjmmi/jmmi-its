@@ -1,6 +1,13 @@
+import { Metadata } from 'next';
+
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ContactUsSection from '@/app/components/sections/ContactUsSection';
+
+export const metadata: Metadata = {
+  title: 'Kontak',
+  description: 'Hubungi JMMI ITS melalui halaman kontak resmi untuk informasi, kolaborasi, dan layanan organisasi.',
+};
 
 export default function ContactPage() {
   return (
